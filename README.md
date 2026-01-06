@@ -78,6 +78,9 @@ Use "ffrelayctl [command] --help" for more information about a command.
 ## Examples
 
 ```bash
+# Generate a random mask
+$ ffrelayctl masks create --description "GitHub" --generated-for "github.com"
+
 # Fetch the custom domain in use (premium only)
 $ ffrelayctl profiles list | jq '.[].subdomain'
 
