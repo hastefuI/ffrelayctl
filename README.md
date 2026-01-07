@@ -30,6 +30,12 @@ $ go build -o ffrelayctl .
 $ go install .
 ```
 
+### Docker
+
+```bash
+$ docker build -t ffrelayctl .
+```
+
 ### Verify Installation
 
 Verify that the installation for ffrelayctl was successful:
@@ -78,11 +84,11 @@ Use "ffrelayctl [command] --help" for more information about a command.
 ## Examples
 
 ```bash
-# Generate a random mask
-$ ffrelayctl masks create --description "GitHub" --generated-for "github.com"
-
 # Fetch the custom domain in use (premium only)
 $ ffrelayctl profiles list | jq '.[].subdomain'
+
+# Generate a random mask
+$ ffrelayctl masks create --description "GitHub" --generated-for "github.com"
 
 # List all enabled masks
 $ ffrelayctl masks list | jq '.[] | select(.mask.enabled == true)'
@@ -98,6 +104,9 @@ $ ffrelayctl masks list --random=true | jq '[.[].num_forwarded] | add'
 
 # Count total masks
 $ ffrelayctl masks list | jq '.[].mask.id' | wc -l
+
+# List all masks using Docker
+$ docker run --rm -e FFRELAYCTL_KEY=<replace-me> ffrelayctl profiles list
 ```
 
 ## Disclaimer

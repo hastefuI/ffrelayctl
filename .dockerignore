@@ -1,0 +1,9 @@
+.DS_Store
+.git
+.gitignore
+*.exe
+*.gif
+*.md
+*.tape
+ffrelayctl
+Thumbs.db
