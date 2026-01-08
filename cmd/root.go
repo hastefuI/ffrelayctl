@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	version    = "1.0.0"
+	version    = "0.4.2"
 	envKeyName = "FFRELAYCTL_KEY"
 )
 
