@@ -119,6 +119,22 @@ type UpdateDomainAddressRequest struct {
 	BlockListEmails *bool   `json:"block_list_emails,omitempty"`
 }
 
+type RelayNumber struct {
+	ID             int     `json:"id"`
+	Number         string  `json:"number"`
+	Enabled        bool    `json:"enabled"`
+	Location       string  `json:"location"`
+	VendorID       string  `json:"vendor_id"`
+	CountryCode    string  `json:"country_code"`
+	CreatedAt      *string `json:"created_at"`
+	RemainingText  int     `json:"remaining_texts"`
+	RemainingMin   int     `json:"remaining_minutes"`
+	CallsForwarded int     `json:"calls_forwarded"`
+	CallsBlocked   int     `json:"calls_blocked"`
+	TextsForwarded int     `json:"texts_forwarded"`
+	TextsBlocked   int     `json:"texts_blocked"`
+}
+
 type APIError struct {
 	StatusCode int
 	Body       string

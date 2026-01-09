@@ -71,12 +71,13 @@ Usage:
 
 Available Commands:
   help                           # Display help for any command
-  profiles list                  # List your Relay profile(s)
   masks list                     # List all masks
   masks get                      # Get a mask
   masks create                   # Create a new mask
   masks update                   # Update a mask
   masks delete                   # Delete a mask
+  phones list                    # List phone masks (premium only)
+  profiles list                  # List available Relay profiles
 
 Use "ffrelayctl [command] --help" for more information about a command.
 ```
