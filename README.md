@@ -3,15 +3,16 @@
 A CLI for [Firefox Relay](https://relay.firefox.com) written in Go.
 
 ## Overview
-Firefox Relay is a privacy service from Mozilla that provides email masks to help keep your identity private.
+Firefox Relay is a privacy service from Mozilla that provides email and phone number masks to help keep your identity private.
 
 `ffrelayctl` is a command-line tool for managing Firefox Relay masks directly from the terminal.
 
 <img src="./demo.gif" alt="Demo" style="width:100%; max-width:900px;" />
 
 ## Features
+- **Email Mask Management**: Manage both random and custom domain email masks
+- **Phone Mask Management**: Manage phone number masks (premium only)
 - **Profile Management**: View your Relay profile and subscription status
-- **Mask Management**: Manage both random and custom domain email masks
 
 ## Installation
 
@@ -105,6 +106,9 @@ $ ffrelayctl masks list --random=true | jq '[.[].num_forwarded] | add'
 
 # Count total masks
 $ ffrelayctl masks list | jq '.[].mask.id' | wc -l
+
+# List phone masks
+$ ffrelayctl phones list | jq
 
 # List all masks using Docker
 $ docker run --rm -e FFRELAYCTL_KEY=<replace-me> ffrelayctl profiles list
