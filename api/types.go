@@ -135,6 +135,10 @@ type RelayNumber struct {
 	TextsBlocked   int     `json:"texts_blocked"`
 }
 
+type UpdateRelayNumberRequest struct {
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
 type APIError struct {
 	StatusCode int
 	Body       string
