@@ -154,6 +154,10 @@ type InboundContact struct {
 	Blocked          bool    `json:"blocked"`
 }
 
+type UpdateInboundContactRequest struct {
+	Blocked *bool `json:"blocked,omitempty"`
+}
+
 type APIError struct {
 	StatusCode int
 	Body       string
