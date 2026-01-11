@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Docker-based commitlint hook
+# Validates commit messages against conventional commit format
+# using Docker to avoid adding npm and node as a dependency on the host
+
+GIT_DIR=$(git rev-parse --git-dir)
+COMMIT_MSG_FILE=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
+
+docker run --rm -i \
+  -v "$(pwd):/ffrelayctl:ro" \
+  -v "$GIT_DIR:/.git:ro" \
+  -v "$COMMIT_MSG_FILE:/commit-msg:ro" \
+  -w /ffrelayctl \
+  -e NODE_PATH=/tmp/node_modules \
+  node:20-alpine \
+  sh -c "apk add --no-cache git >/dev/null 2>&1 && npm install --prefix /tmp --no-save @commitlint/cli@latest @commitlint/config-conventional@latest >/dev/null 2>&1 && /tmp/node_modules/.bin/commitlint --edit /commit-msg"

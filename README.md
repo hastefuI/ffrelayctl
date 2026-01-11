@@ -120,6 +120,15 @@ $ ffrelayctl contacts list | jq '[.[] | select(.last_inbound_type == "text")]'
 $ docker run --rm -e FFRELAYCTL_KEY=<replace-me> ffrelayctl profiles list
 ```
 
+## Development
+
+### Setup
+
+After cloning this repository, run:
+```bash
+$ make setup
+```
+
 ## Disclaimer
 
 This is an unofficial CLI not affiliated with or endorsed by Mozilla or Firefox Relay.
