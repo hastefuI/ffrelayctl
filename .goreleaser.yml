@@ -145,6 +145,7 @@ brews:
       name: homebrew-tap
       branch: main
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
     commit_author:
       name: "{{ .Env.HOMEBREW_TAP_PUBLISHER_NAME }}"
       email: "{{ .Env.HOMEBREW_TAP_PUBLISHER_EMAIL }}"
