@@ -53,4 +53,8 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
           GORELEASER_REPO_OWNER: ${{ steps.maintainer.outputs.owner }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          HOMEBREW_TAP_PUBLISHER_NAME: ${{ vars.HOMEBREW_TAP_PUBLISHER_NAME }}
+          HOMEBREW_TAP_PUBLISHER_EMAIL: ${{ vars.HOMEBREW_TAP_PUBLISHER_EMAIL }}

@@ -139,6 +139,25 @@ docker_manifests:
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-amd64"
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-arm64"
 
+brews:
+  - repository:
+      owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: "{{ .Env.HOMEBREW_TAP_PUBLISHER_NAME }}"
+      email: "{{ .Env.HOMEBREW_TAP_PUBLISHER_EMAIL }}"
+    commit_msg_template: "chore(brew): update formula for {{ .ProjectName }} {{ .Tag }}"
+    name: ffrelayctl
+    homepage: "https://github.com/hastefuI/ffrelayctl"
+    description: "A CLI for Firefox Relay"
+    license: "MIT"
+    install: |
+      bin.install "ffrelayctl"
+    test: |
+      system "#{bin}/ffrelayctl", "--version"
+
 release:
   draft: false
   prerelease: "{{ if semverCompare \"<1.0.0\" .Version }}true{{ else }}auto{{ end }}"
