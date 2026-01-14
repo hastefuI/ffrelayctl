@@ -139,6 +139,23 @@ type UpdateRelayNumberRequest struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
 
+type PhoneNumberOption struct {
+	FriendlyName string  `json:"friendly_name"`
+	ISOCountry   string  `json:"iso_country"`
+	Locality     *string `json:"locality"`
+	PhoneNumber  string  `json:"phone_number"`
+	PostalCode   *string `json:"postal_code"`
+	Region       string  `json:"region"`
+}
+
+type RelayNumberSuggestions struct {
+	RealNum            *string             `json:"real_num"`
+	SamePrefixOptions  []PhoneNumberOption `json:"same_prefix_options"`
+	OtherAreasOptions  []PhoneNumberOption `json:"other_areas_options"`
+	SameAreaOptions    []PhoneNumberOption `json:"same_area_options"`
+	RandomOptions      []PhoneNumberOption `json:"random_options"`
+}
+
 type InboundContact struct {
 	ID               int     `json:"id"`
 	RelayNumber      int     `json:"relay_number"`
@@ -156,6 +173,28 @@ type InboundContact struct {
 
 type UpdateInboundContactRequest struct {
 	Blocked *bool `json:"blocked,omitempty"`
+}
+
+type User struct {
+	Email string `json:"email"`
+}
+
+type RealPhone struct {
+	ID                   int     `json:"id"`
+	Number               string  `json:"number"`
+	VerificationSentDate *string `json:"verification_sent_date"`
+	Verified             bool    `json:"verified"`
+	VerifiedDate         *string `json:"verified_date"`
+	CountryCode          string  `json:"country_code"`
+}
+
+type RegisterRealPhoneRequest struct {
+	Number string `json:"number"`
+}
+
+type VerifyRealPhoneRequest struct {
+	Number           string `json:"number"`
+	VerificationCode string `json:"verification_code"`
 }
 
 type APIError struct {

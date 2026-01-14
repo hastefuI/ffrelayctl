@@ -32,6 +32,7 @@ Examples:
 			Phones   []api.RelayNumber    `json:"phones"`
 			Profiles []api.Profile        `json:"profiles"`
 			Contacts []api.InboundContact `json:"contacts"`
+			Users    []api.User           `json:"users"`
 		}
 
 		var (
@@ -41,7 +42,7 @@ Examples:
 			result exportData
 		)
 
-		wg.Add(4)
+		wg.Add(5)
 
 		go func() {
 			defer wg.Done()
@@ -112,6 +113,20 @@ Examples:
 			}
 			mu.Lock()
 			result.Contacts = contacts
+			mu.Unlock()
+		}()
+
+		go func() {
+			defer wg.Done()
+			users, err := cfg.Client.ListUsers()
+			if err != nil {
+				mu.Lock()
+				errors = append(errors, fmt.Errorf("failed to fetch users: %w", err))
+				mu.Unlock()
+				return
+			}
+			mu.Lock()
+			result.Users = users
 			mu.Unlock()
 		}()
 

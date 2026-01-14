@@ -403,7 +403,7 @@ func TestClient_DeleteDomainAddress(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			httpmock.Reset()
 
-			url := fmt.Sprintf("https://relay.firefox.com/api/v1/domainaddresses/%d/", tt.id)
+			url := fmt.Sprintf("%s%sdomainaddresses/%d/", DefaultBaseURL, APIBasePath, tt.id)
 			httpmock.RegisterResponder(
 				http.MethodDelete,
 				url,

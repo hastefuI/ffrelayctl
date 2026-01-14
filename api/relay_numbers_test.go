@@ -107,7 +107,7 @@ func TestClient_ListRelayNumbers(t *testing.T) {
 
 			client := NewClient("test")
 
-			httpmock.RegisterResponder("GET", DefaultBaseURL+"/api/v1/relaynumber/",
+			httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"relaynumber/",
 				httpmock.NewStringResponder(tt.mockStatusCode, tt.mockResponse))
 
 			numbers, err := client.ListRelayNumbers()
@@ -147,7 +147,7 @@ func TestClient_ListRelayNumbers_InvalidJSON(t *testing.T) {
 
 	client := NewClient("test")
 
-	httpmock.RegisterResponder("GET", DefaultBaseURL+"/api/v1/relaynumber/",
+	httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"relaynumber/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
 	_, err := client.ListRelayNumbers()
@@ -300,7 +300,7 @@ func TestClient_UpdateRelayNumber_InvalidJSON(t *testing.T) {
 	client := NewClient("test")
 	enabled := false
 
-	httpmock.RegisterResponder("PATCH", DefaultBaseURL+"/api/v1/relaynumber/1/",
+	httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"relaynumber/1/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
 	_, err := client.UpdateRelayNumber(1, UpdateRelayNumberRequest{Enabled: &enabled})

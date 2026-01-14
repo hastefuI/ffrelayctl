@@ -118,6 +118,14 @@ func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
 	return c.Do(req)
 }
 
+func (c *Client) Put(path string, body io.Reader) (*http.Response, error) {
+	req, err := c.NewRequest(http.MethodPut, path, body)
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(req)
+}
+
 func (c *Client) Patch(path string, body io.Reader) (*http.Response, error) {
 	req, err := c.NewRequest(http.MethodPatch, path, body)
 	if err != nil {

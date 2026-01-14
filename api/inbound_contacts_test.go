@@ -110,7 +110,7 @@ func TestClient_ListInboundContacts(t *testing.T) {
 
 			client := NewClient("test")
 
-			httpmock.RegisterResponder("GET", DefaultBaseURL+"/api/v1/inboundcontact/",
+			httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"inboundcontact/",
 				httpmock.NewStringResponder(tt.mockStatusCode, tt.mockResponse))
 
 			contacts, err := client.ListInboundContacts()
@@ -153,7 +153,7 @@ func TestClient_ListInboundContacts_InvalidJSON(t *testing.T) {
 
 	client := NewClient("test")
 
-	httpmock.RegisterResponder("GET", DefaultBaseURL+"/api/v1/inboundcontact/",
+	httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"inboundcontact/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
 	_, err := client.ListInboundContacts()
@@ -304,7 +304,7 @@ func TestClient_UpdateInboundContact_InvalidJSON(t *testing.T) {
 	client := NewClient("test")
 	blocked := true
 
-	httpmock.RegisterResponder("PATCH", DefaultBaseURL+"/api/v1/inboundcontact/1/",
+	httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"inboundcontact/1/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
 	_, err := client.UpdateInboundContact(1, UpdateInboundContactRequest{Blocked: &blocked})
