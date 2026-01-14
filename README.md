@@ -13,6 +13,7 @@ Firefox Relay is a privacy service from Mozilla that provides email and phone nu
 - **Email Mask Management**: Manage both random and custom domain email masks
 - **Phone Mask Management**: Manage phone number masks and inbound contacts (premium only)
 - **Profile Management**: View your Relay profile and subscription status
+- **Data Export**: Export all masks, phone numbers, profiles, and contacts for backup purposes
 
 ## Installation
 
@@ -88,6 +89,7 @@ Available Commands:
   phones list                    # List phone masks (premium only)
   phones update                  # Update a phone mask (premium only)
   profiles list                  # List available Relay profiles
+  export                         # Export all Firefox Relay account data
 
 Use "ffrelayctl [command] --help" for more information about a command.
 ```
