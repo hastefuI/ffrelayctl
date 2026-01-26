@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hastefuI/ffrelayctl/api"
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -86,20 +87,15 @@ Examples:
 				return err
 			}
 
-			type combinedMask struct {
-				Type string      `json:"type"`
-				Mask interface{} `json:"mask"`
-			}
-
-			combined := make([]combinedMask, 0)
+			combined := make([]output.CombinedMask, 0)
 			for _, addr := range relayAddresses {
-				combined = append(combined, combinedMask{Type: "random", Mask: addr})
+				combined = append(combined, output.CombinedMask{Type: "random", Mask: addr})
 			}
 			for _, addr := range domainAddresses {
-				combined = append(combined, combinedMask{Type: "custom", Mask: addr})
+				combined = append(combined, output.CombinedMask{Type: "custom", Mask: addr})
 			}
 
-			return printJSON(combined)
+			return output.Print(cfg.OutputFormat, combined)
 		}
 
 		if *randomMask {
@@ -107,13 +103,13 @@ Examples:
 			if err != nil {
 				return err
 			}
-			return printJSON(addresses)
+			return output.Print(cfg.OutputFormat, addresses)
 		} else {
 			addresses, err := cfg.Client.ListDomainAddresses()
 			if err != nil {
 				return err
 			}
-			return printJSON(addresses)
+			return output.Print(cfg.OutputFormat, addresses)
 		}
 	},
 }
@@ -143,19 +139,19 @@ Examples:
 				if err != nil {
 					return err
 				}
-				return printJSON(address)
+				return output.Print(cfg.OutputFormat, address)
 			} else {
 				address, err := cfg.Client.GetDomainAddress(id)
 				if err != nil {
 					return err
 				}
-				return printJSON(address)
+				return output.Print(cfg.OutputFormat, address)
 			}
 		}
 
 		address, err := cfg.Client.GetRelayAddress(id)
 		if err == nil {
-			return printJSON(address)
+			return output.Print(cfg.OutputFormat, address)
 		}
 
 		profiles, profileErr := cfg.Client.GetProfiles()
@@ -166,7 +162,7 @@ Examples:
 		if len(profiles) > 0 && profiles[0].HasPremium {
 			domainAddress, domainErr := cfg.Client.GetDomainAddress(id)
 			if domainErr == nil {
-				return printJSON(domainAddress)
+				return output.Print(cfg.OutputFormat, domainAddress)
 			}
 			return err
 		}
@@ -221,7 +217,7 @@ For custom domain masks (--random=false, Premium required):
 			if err != nil {
 				return err
 			}
-			return printJSON(address)
+			return output.Print(cfg.OutputFormat, address)
 		} else {
 			address, err := cmd.Flags().GetString("address")
 			if err != nil {
@@ -242,7 +238,7 @@ For custom domain masks (--random=false, Premium required):
 			if err != nil {
 				return err
 			}
-			return printJSON(domainAddress)
+			return output.Print(cfg.OutputFormat, domainAddress)
 		}
 	},
 }
@@ -287,7 +283,7 @@ Examples:
 			if err != nil {
 				return err
 			}
-			return printJSON(address)
+			return output.Print(cfg.OutputFormat, address)
 		} else {
 			req := api.UpdateDomainAddressRequest{
 				Enabled:         fields.enabled,
@@ -299,7 +295,7 @@ Examples:
 			if err != nil {
 				return err
 			}
-			return printJSON(address)
+			return output.Print(cfg.OutputFormat, address)
 		}
 	},
 }

@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/hastefuI/ffrelayctl/api"
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -22,17 +23,12 @@ Examples:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
 
-		type combinedMask struct {
-			Type string      `json:"type"`
-			Mask interface{} `json:"mask"`
-		}
-
 		type exportData struct {
-			Masks    []combinedMask       `json:"masks"`
-			Phones   []api.RelayNumber    `json:"phones"`
-			Profiles []api.Profile        `json:"profiles"`
-			Contacts []api.InboundContact `json:"contacts"`
-			Users    []api.User           `json:"users"`
+			Masks    []output.CombinedMask `json:"masks"`
+			Phones   []api.RelayNumber     `json:"phones"`
+			Profiles []api.Profile         `json:"profiles"`
+			Contacts []api.InboundContact  `json:"contacts"`
+			Users    []api.User            `json:"users"`
 		}
 
 		var (
@@ -61,12 +57,12 @@ Examples:
 				return
 			}
 
-			combined := make([]combinedMask, 0, len(relayAddresses)+len(domainAddresses))
+			combined := make([]output.CombinedMask, 0, len(relayAddresses)+len(domainAddresses))
 			for _, addr := range relayAddresses {
-				combined = append(combined, combinedMask{Type: "random", Mask: addr})
+				combined = append(combined, output.CombinedMask{Type: "random", Mask: addr})
 			}
 			for _, addr := range domainAddresses {
-				combined = append(combined, combinedMask{Type: "custom", Mask: addr})
+				combined = append(combined, output.CombinedMask{Type: "custom", Mask: addr})
 			}
 
 			mu.Lock()
@@ -139,7 +135,7 @@ Examples:
 			return fmt.Errorf("failed to export data: %d error(s) occurred", len(errors))
 		}
 
-		return printJSON(result)
+		return output.Print(cfg.OutputFormat, result)
 	},
 }
 

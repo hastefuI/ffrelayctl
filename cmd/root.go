@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hastefuI/ffrelayctl/api"
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -23,13 +24,14 @@ type VersionInfo struct {
 }
 
 type CmdConfig struct {
-	APIKey      string
-	BaseURL     string
-	Timeout     time.Duration
-	Client      *api.Client
-	Ctx         context.Context
-	Cancel      context.CancelFunc
-	VersionInfo VersionInfo
+	APIKey       string
+	BaseURL      string
+	Timeout      time.Duration
+	OutputFormat string
+	Client       *api.Client
+	Ctx          context.Context
+	Cancel       context.CancelFunc
+	VersionInfo  VersionInfo
 }
 
 type configKey struct{}
@@ -49,6 +51,16 @@ var rootCmd = &cobra.Command{
 		}
 
 		cfg := GetConfig(cmd)
+
+		cfg.APIKey, _ = cmd.Flags().GetString("key")
+		cfg.BaseURL, _ = cmd.Flags().GetString("base-url")
+		cfg.Timeout, _ = cmd.Flags().GetDuration("timeout")
+		cfg.OutputFormat, _ = cmd.Flags().GetString("output")
+
+		if !output.IsValidFormat(cfg.OutputFormat) {
+			return fmt.Errorf("invalid output format %q: must be one of [text|json]", cfg.OutputFormat)
+		}
+
 		cfg.Ctx, cfg.Cancel = context.WithCancel(cmd.Context())
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
@@ -89,21 +101,17 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().String("key", "", "API key for authentication")
 	rootCmd.PersistentFlags().String("base-url", "", fmt.Sprintf("Base URL for the API (default: %s)", api.DefaultBaseURL))
+	rootCmd.PersistentFlags().String("key", "", "API key for authentication")
+	rootCmd.PersistentFlags().StringP("output", "o", output.FormatText, "Output format [text|json]")
 	rootCmd.PersistentFlags().Duration("timeout", api.DefaultTimeout, "HTTP request timeout (e.g., 15s, 2m)")
 }
 
 func Execute(vi VersionInfo) {
 	cfg := &CmdConfig{
-		Timeout:     api.DefaultTimeout,
-		VersionInfo: vi,
-	}
-
-	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
-		cfg.APIKey, _ = cmd.Flags().GetString("key")
-		cfg.BaseURL, _ = cmd.Flags().GetString("base-url")
-		cfg.Timeout, _ = cmd.Flags().GetDuration("timeout")
+		Timeout:      api.DefaultTimeout,
+		OutputFormat: output.FormatText,
+		VersionInfo:  vi,
 	}
 
 	ctxWithConfig := context.WithValue(context.Background(), configKey{}, cfg)

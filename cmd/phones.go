@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hastefuI/ffrelayctl/api"
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +34,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(numbers)
+		return output.Print(cfg.OutputFormat,numbers)
 	},
 }
 
@@ -78,7 +79,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(number)
+		return output.Print(cfg.OutputFormat,number)
 	},
 }
 
@@ -103,7 +104,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(suggestions)
+		return output.Print(cfg.OutputFormat,suggestions)
 	},
 }
 
@@ -134,7 +135,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(numbers)
+		return output.Print(cfg.OutputFormat,numbers)
 	},
 }
 
@@ -161,7 +162,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(phones)
+		return output.Print(cfg.OutputFormat,phones)
 	},
 }
 
@@ -191,7 +192,7 @@ Examples:
 
 		for _, phone := range phones {
 			if phone.ID == id {
-				return printJSON(phone)
+				return output.Print(cfg.OutputFormat,phone)
 			}
 		}
 
@@ -227,7 +228,7 @@ Examples:
 			}
 			return err
 		}
-		return printJSON(phone)
+		return output.Print(cfg.OutputFormat,phone)
 	},
 }
 
@@ -263,7 +264,7 @@ Examples:
 			}
 			return err
 		}
-		return printJSON(phone)
+		return output.Print(cfg.OutputFormat,phone)
 	},
 }
 

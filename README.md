@@ -107,31 +107,31 @@ Use "ffrelayctl [command] --help" for more information about a command.
 
 ```bash
 # Fetch the custom domain in use (premium only)
-$ ffrelayctl profiles list | jq '.[].subdomain'
+$ ffrelayctl profiles list --output json | jq '.[].subdomain'
 
 # Generate a random mask
 $ ffrelayctl masks create --description "GitHub" --generated-for "github.com"
 
 # List all enabled masks
-$ ffrelayctl masks list | jq '.[] | select(.mask.enabled == true)'
+$ ffrelayctl masks list --output json | jq '.[] | select(.mask.enabled == true)'
 
 # List email addresses in use by all masks
-$ ffrelayctl masks list | jq '.[].mask.full_address'
+$ ffrelayctl masks list --output json | jq '.[].mask.full_address'
 
 # List all masks containing "newsletter" in the description
-$ ffrelayctl masks list | jq '.[] | select(.mask.description | test("newsletter"; "i"))'
+$ ffrelayctl masks list --output json | jq '.[] | select(.mask.description | test("newsletter"; "i"))'
 
 # Count total forwarded emails from random masks
-$ ffrelayctl masks list --random=true | jq '[.[].num_forwarded] | add'
+$ ffrelayctl masks list --random=true --output json | jq '[.[].num_forwarded] | add'
 
 # Count total masks
-$ ffrelayctl masks list | jq '.[].mask.id' | wc -l
+$ ffrelayctl masks list --output json | jq '.[].mask.id' | wc -l
 
 # List phone masks
-$ ffrelayctl phones list | jq
+$ ffrelayctl phones list --output json | jq
 
 # List all phone numbers that have texted your Relay number
-$ ffrelayctl contacts list | jq '[.[] | select(.last_inbound_type == "text")]'
+$ ffrelayctl contacts list --output json | jq '[.[] | select(.last_inbound_type == "text")]'
 
 # List all masks using Docker
 $ docker run --rm -e FFRELAYCTL_KEY=<replace-me> ffrelayctl profiles list

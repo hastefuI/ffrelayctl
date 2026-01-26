@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/hastefuI/ffrelayctl/api"
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +34,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(contacts)
+		return output.Print(cfg.OutputFormat,contacts)
 	},
 }
 
@@ -80,7 +81,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(contact)
+		return output.Print(cfg.OutputFormat,contact)
 	},
 }
 

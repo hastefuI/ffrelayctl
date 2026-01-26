@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +24,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return printJSON(users)
+		return output.Print(cfg.OutputFormat, users)
 	},
 }
 

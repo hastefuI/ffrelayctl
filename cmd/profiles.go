@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"encoding/json"
-	"fmt"
-
+	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -22,20 +20,11 @@ var profilesListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return printJSON(profiles)
+		return output.Print(cfg.OutputFormat, profiles)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(profilesCmd)
 	profilesCmd.AddCommand(profilesListCmd)
-}
-
-func printJSON(v interface{}) error {
-	data, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return fmt.Errorf("error formatting output: %v", err)
-	}
-	fmt.Println(string(data))
-	return nil
 }
