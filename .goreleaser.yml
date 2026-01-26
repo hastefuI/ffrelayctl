@@ -92,6 +92,7 @@ dockers:
       - main.go
       - api
       - cmd
+      - output
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
@@ -115,6 +116,7 @@ dockers:
       - main.go
       - api
       - cmd
+      - output
     build_flag_templates:
       - "--platform=linux/arm64"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
