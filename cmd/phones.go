@@ -59,12 +59,10 @@ Examples:
 
 		var enabled *bool
 		if cmd.Flags().Changed("enabled") {
-			val := true
-			enabled = &val
+			enabled = new(true)
 		}
 		if cmd.Flags().Changed("disabled") {
-			val := false
-			enabled = &val
+			enabled = new(false)
 		}
 
 		if enabled == nil {

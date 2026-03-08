@@ -231,7 +231,7 @@ func TestProfile_BounceStatusMarshal(t *testing.T) {
 		t.Fatalf("json.Marshal() error = %v", err)
 	}
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(data, &result); err != nil {
 		t.Fatalf("json.Unmarshal() error = %v", err)
 	}
@@ -241,7 +241,7 @@ func TestProfile_BounceStatusMarshal(t *testing.T) {
 		t.Fatal("bounce_status field not found in marshaled JSON")
 	}
 
-	bounceArray, ok := bounceStatus.([]interface{})
+	bounceArray, ok := bounceStatus.([]any)
 	if !ok {
 		t.Fatalf("bounce_status is not an array, got type %T", bounceStatus)
 	}

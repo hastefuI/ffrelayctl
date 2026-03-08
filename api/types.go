@@ -30,7 +30,7 @@ type BounceStatus struct {
 }
 
 func (b *BounceStatus) UnmarshalJSON(data []byte) error {
-	var tuple []interface{}
+	var tuple []any
 	if err := json.Unmarshal(data, &tuple); err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (b *BounceStatus) UnmarshalJSON(data []byte) error {
 }
 
 func (b BounceStatus) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]interface{}{b.Paused, b.Type})
+	return json.Marshal([]any{b.Paused, b.Type})
 }
 
 type RelayAddress struct {

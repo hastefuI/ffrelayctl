@@ -33,8 +33,7 @@ func parseCommonUpdateFlags(cmd *cobra.Command) (commonUpdateFields, error) {
 		fields.enabled = &enabled
 	}
 	if cmd.Flags().Changed("disabled") {
-		disabled := false
-		fields.enabled = &disabled
+		fields.enabled = new(false)
 	}
 	if cmd.Flags().Changed("description") {
 		description, err := cmd.Flags().GetString("description")
@@ -44,12 +43,10 @@ func parseCommonUpdateFlags(cmd *cobra.Command) (commonUpdateFields, error) {
 		fields.description = &description
 	}
 	if cmd.Flags().Changed("block-list") {
-		blockList := true
-		fields.blockListEmails = &blockList
+		fields.blockListEmails = new(true)
 	}
 	if cmd.Flags().Changed("no-block-list") {
-		blockList := false
-		fields.blockListEmails = &blockList
+		fields.blockListEmails = new(false)
 	}
 
 	return fields, nil
@@ -405,8 +402,7 @@ func init() {
 				}
 				randomMask = &val
 			} else {
-				defaultVal := true
-				randomMask = &defaultVal
+				randomMask = new(true)
 			}
 			if defaultPreRunE != nil {
 				return defaultPreRunE(cmd, args)

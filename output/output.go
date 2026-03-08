@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 	"text/tabwriter"
 
@@ -17,8 +18,8 @@ const (
 )
 
 type CombinedMask struct {
-	Type string      `json:"type"`
-	Mask interface{} `json:"mask"`
+	Type string `json:"type"`
+	Mask any    `json:"mask"`
 }
 
 func ValidFormats() []string {
@@ -26,19 +27,14 @@ func ValidFormats() []string {
 }
 
 func IsValidFormat(format string) bool {
-	for _, f := range ValidFormats() {
-		if f == format {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(ValidFormats(), format)
 }
 
-func Print(format string, v interface{}) error {
+func Print(format string, v any) error {
 	return Fprint(os.Stdout, format, v)
 }
 
-func Fprint(w io.Writer, format string, v interface{}) error {
+func Fprint(w io.Writer, format string, v any) error {
 	switch format {
 	case FormatJSON:
 		return printJSON(w, v)
@@ -49,7 +45,7 @@ func Fprint(w io.Writer, format string, v interface{}) error {
 	}
 }
 
-func printJSON(w io.Writer, v interface{}) error {
+func printJSON(w io.Writer, v any) error {
 	data, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error formatting output: %v", err)
@@ -58,7 +54,7 @@ func printJSON(w io.Writer, v interface{}) error {
 	return nil
 }
 
-func printText(w io.Writer, v interface{}) error {
+func printText(w io.Writer, v any) error {
 	switch data := v.(type) {
 	case []api.User:
 		return printUsers(w, data)

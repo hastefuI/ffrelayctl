@@ -270,9 +270,6 @@ func TestClient_UpdateRelayAddress(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	enabled := false
-	description := "Updated description"
-
 	tests := []struct {
 		name           string
 		id             int
@@ -286,8 +283,8 @@ func TestClient_UpdateRelayAddress(t *testing.T) {
 			name: "successful update",
 			id:   12345,
 			request: UpdateRelayAddressRequest{
-				Enabled:     &enabled,
-				Description: &description,
+				Enabled:     new(false),
+				Description: new("Updated description"),
 			},
 			mockResponse: `{
 				"id": 12345,
@@ -321,7 +318,7 @@ func TestClient_UpdateRelayAddress(t *testing.T) {
 			name: "not found",
 			id:   99999,
 			request: UpdateRelayAddressRequest{
-				Enabled: &enabled,
+				Enabled: new(false),
 			},
 			mockResponse:   `{"detail": "Not found."}`,
 			mockStatusCode: http.StatusNotFound,

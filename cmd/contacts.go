@@ -61,12 +61,10 @@ Examples:
 
 		var blocked *bool
 		if cmd.Flags().Changed("block") {
-			val := true
-			blocked = &val
+			blocked = new(true)
 		}
 		if cmd.Flags().Changed("unblock") {
-			val := false
-			blocked = &val
+			blocked = new(false)
 		}
 
 		if blocked == nil {

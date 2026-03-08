@@ -160,9 +160,6 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	trueVal := true
-	falseVal := false
-
 	tests := []struct {
 		name           string
 		relayID        int
@@ -176,7 +173,7 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 			name:    "successfully disable relay number",
 			relayID: 1,
 			request: UpdateRelayNumberRequest{
-				Enabled: &falseVal,
+				Enabled: new(false),
 			},
 			mockResponse: `{
 				"id": 1,
@@ -201,7 +198,7 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 			name:    "successfully enable relay number",
 			relayID: 2,
 			request: UpdateRelayNumberRequest{
-				Enabled: &trueVal,
+				Enabled: new(true),
 			},
 			mockResponse: `{
 				"id": 2,
@@ -226,7 +223,7 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 			name:    "relay number not found",
 			relayID: 999,
 			request: UpdateRelayNumberRequest{
-				Enabled: &falseVal,
+				Enabled: new(false),
 			},
 			mockResponse:   `{"detail": "Not found"}`,
 			mockStatusCode: http.StatusNotFound,
@@ -236,7 +233,7 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 			name:    "unauthorized",
 			relayID: 1,
 			request: UpdateRelayNumberRequest{
-				Enabled: &falseVal,
+				Enabled: new(false),
 			},
 			mockResponse:   `{"detail": "Invalid token"}`,
 			mockStatusCode: http.StatusUnauthorized,
@@ -246,7 +243,7 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 			name:    "forbidden - no phone subscription",
 			relayID: 1,
 			request: UpdateRelayNumberRequest{
-				Enabled: &falseVal,
+				Enabled: new(false),
 			},
 			mockResponse:   `{"detail": "Phone subscription required"}`,
 			mockStatusCode: http.StatusForbidden,
@@ -298,12 +295,11 @@ func TestClient_UpdateRelayNumber_InvalidJSON(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	client := NewClient("test")
-	enabled := false
 
 	httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"relaynumber/1/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
-	_, err := client.UpdateRelayNumber(1, UpdateRelayNumberRequest{Enabled: &enabled})
+	_, err := client.UpdateRelayNumber(1, UpdateRelayNumberRequest{Enabled: new(false)})
 	if err == nil {
 		t.Error("UpdateRelayNumber() expected error for invalid JSON, got nil")
 	}

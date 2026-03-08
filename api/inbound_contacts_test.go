@@ -166,9 +166,6 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	trueVal := true
-	falseVal := false
-
 	tests := []struct {
 		name           string
 		contactID      int
@@ -182,7 +179,7 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 			name:      "successfully block contact",
 			contactID: 1,
 			request: UpdateInboundContactRequest{
-				Blocked: &trueVal,
+				Blocked: new(true),
 			},
 			mockResponse: `{
 				"id": 1,
@@ -206,7 +203,7 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 			name:      "successfully unblock contact",
 			contactID: 2,
 			request: UpdateInboundContactRequest{
-				Blocked: &falseVal,
+				Blocked: new(false),
 			},
 			mockResponse: `{
 				"id": 2,
@@ -230,7 +227,7 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 			name:      "contact not found",
 			contactID: 999,
 			request: UpdateInboundContactRequest{
-				Blocked: &trueVal,
+				Blocked: new(true),
 			},
 			mockResponse:   `{"detail": "Not found"}`,
 			mockStatusCode: http.StatusNotFound,
@@ -240,7 +237,7 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 			name:      "unauthorized",
 			contactID: 1,
 			request: UpdateInboundContactRequest{
-				Blocked: &trueVal,
+				Blocked: new(true),
 			},
 			mockResponse:   `{"detail": "Invalid token"}`,
 			mockStatusCode: http.StatusUnauthorized,
@@ -250,7 +247,7 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 			name:      "forbidden - no phone subscription",
 			contactID: 1,
 			request: UpdateInboundContactRequest{
-				Blocked: &trueVal,
+				Blocked: new(true),
 			},
 			mockResponse:   `{"detail": "Phone subscription required"}`,
 			mockStatusCode: http.StatusForbidden,
@@ -302,12 +299,10 @@ func TestClient_UpdateInboundContact_InvalidJSON(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	client := NewClient("test")
-	blocked := true
-
 	httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"inboundcontact/1/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
-	_, err := client.UpdateInboundContact(1, UpdateInboundContactRequest{Blocked: &blocked})
+	_, err := client.UpdateInboundContact(1, UpdateInboundContactRequest{Blocked: new(true)})
 	if err == nil {
 		t.Error("UpdateInboundContact() expected error for invalid JSON, got nil")
 	}

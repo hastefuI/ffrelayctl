@@ -38,10 +38,7 @@ Examples:
 			result exportData
 		)
 
-		wg.Add(5)
-
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			relayAddresses, err := cfg.Client.ListRelayAddresses()
 			if err != nil {
 				mu.Lock()
@@ -68,10 +65,9 @@ Examples:
 			mu.Lock()
 			result.Masks = combined
 			mu.Unlock()
-		}()
+		})
 
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			numbers, err := cfg.Client.ListRelayNumbers()
 			if err != nil {
 				mu.Lock()
@@ -82,10 +78,9 @@ Examples:
 			mu.Lock()
 			result.Phones = numbers
 			mu.Unlock()
-		}()
+		})
 
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			profiles, err := cfg.Client.GetProfiles()
 			if err != nil {
 				mu.Lock()
@@ -96,10 +91,9 @@ Examples:
 			mu.Lock()
 			result.Profiles = profiles
 			mu.Unlock()
-		}()
+		})
 
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			contacts, err := cfg.Client.ListInboundContacts()
 			if err != nil {
 				mu.Lock()
@@ -110,10 +104,9 @@ Examples:
 			mu.Lock()
 			result.Contacts = contacts
 			mu.Unlock()
-		}()
+		})
 
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			users, err := cfg.Client.ListUsers()
 			if err != nil {
 				mu.Lock()
@@ -124,7 +117,7 @@ Examples:
 			mu.Lock()
 			result.Users = users
 			mu.Unlock()
-		}()
+		})
 
 		wg.Wait()
 

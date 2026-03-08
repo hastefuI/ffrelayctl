@@ -284,10 +284,6 @@ func TestClient_UpdateDomainAddress(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	enabled := false
-	description := "Updated description"
-	blockList := true
-
 	tests := []struct {
 		name           string
 		id             int
@@ -301,9 +297,9 @@ func TestClient_UpdateDomainAddress(t *testing.T) {
 			name: "successful update",
 			id:   12345,
 			request: UpdateDomainAddressRequest{
-				Enabled:         &enabled,
-				Description:     &description,
-				BlockListEmails: &blockList,
+				Enabled:         new(false),
+				Description:     new("Updated description"),
+				BlockListEmails: new(true),
 			},
 			mockResponse: `{
 				"id": 12345,
@@ -337,7 +333,7 @@ func TestClient_UpdateDomainAddress(t *testing.T) {
 			name: "not found",
 			id:   99999,
 			request: UpdateDomainAddressRequest{
-				Enabled: &enabled,
+				Enabled: new(false),
 			},
 			mockResponse:   `{"detail": "Not found."}`,
 			mockStatusCode: http.StatusNotFound,
