@@ -84,6 +84,8 @@ dockers:
   - image_templates:
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}-amd64"
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-amd64"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-amd64"
     use: buildx
     dockerfile: Dockerfile
     extra_files:
@@ -108,6 +110,8 @@ dockers:
   - image_templates:
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}-arm64"
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-arm64"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-arm64"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-arm64"
     use: buildx
     dockerfile: Dockerfile
     extra_files:
@@ -140,6 +144,16 @@ docker_manifests:
     image_templates:
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-amd64"
       - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-arm64"
+
+  - name_template: "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}"
+    image_templates:
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-arm64"
+
+  - name_template: "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest"
+    image_templates:
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-amd64"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-arm64"
 
 brews:
   - repository:
