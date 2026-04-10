@@ -13,6 +13,17 @@ setup: ## Set up development environment
 	@chmod +x .githooks/commit-msg
 	@echo "Git hooks installed"
 
+.PHONY: vet
+vet: ## Run go vet
+	@go vet ./...
+
+.PHONY: test
+test: ## Run tests
+	@go test ./...
+
+.PHONY: check
+check: vet test ## Run vet and tests
+
 .PHONY: help
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

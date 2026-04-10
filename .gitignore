@@ -1,5 +1,8 @@
 .DS_Store
+.gocache
 *.exe
 *.tape
+coverage.out
+dist/
 ffrelayctl
 Thumbs.db

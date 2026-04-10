@@ -29,6 +29,9 @@ jobs:
       - name: Build
         run: go build -o ffrelayctl .
 
+      - name: Run go vet
+        run: go vet ./...
+
       - name: Run tests
         run: go test -v ./...
 
