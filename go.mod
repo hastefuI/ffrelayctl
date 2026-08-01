@@ -3,7 +3,7 @@ module github.com/hastefuI/ffrelayctl
 go 1.26
 
 require (
-	github.com/jarcoal/httpmock v1.4.1
+	github.com/jarcoal/httpmock v1.4.2
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 )
