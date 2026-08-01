@@ -1,4 +1,4 @@
-# ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![Go Report Card](https://goreportcard.com/badge/github.com/hastefuI/ffrelayctl)](https://goreportcard.com/report/github.com/hastefuI/ffrelayctl) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE)
+# ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE)
 
 A CLI for [Firefox Relay](https://relay.firefox.com) written in Go.
 
