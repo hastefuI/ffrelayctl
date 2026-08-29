@@ -1,12 +1,12 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -107,7 +107,7 @@ func (c *Client) UpdateRelayNumber(ctx context.Context, id int, req UpdateRelayN
 	}
 
 	path := fmt.Sprintf("%s%d/", relayNumbersPath, id)
-	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,12 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -68,7 +68,7 @@ func (c *Client) CreateDomainAddress(ctx context.Context, req CreateDomainAddres
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	resp, err := c.Post(ctx, domainAddressesPath, strings.NewReader(string(jsonBody)))
+	resp, err := c.Post(ctx, domainAddressesPath, bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *Client) UpdateDomainAddress(ctx context.Context, id int, req UpdateDoma
 	}
 
 	path := fmt.Sprintf("%s%d/", domainAddressesPath, id)
-	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}

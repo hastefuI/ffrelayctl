@@ -55,7 +55,7 @@ Examples:
 		cfg := GetConfig(cmd)
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("invalid ID: %v", err)
+			return fmt.Errorf("invalid ID: %w", err)
 		}
 
 		var enabled *bool
@@ -181,7 +181,7 @@ Examples:
 		cfg := GetConfig(cmd)
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("invalid ID: %v", err)
+			return fmt.Errorf("invalid ID: %w", err)
 		}
 
 		phones, err := cfg.Client.GetRealPhone(cfg.Ctx)
@@ -248,7 +248,7 @@ Examples:
 		cfg := GetConfig(cmd)
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("invalid ID: %v", err)
+			return fmt.Errorf("invalid ID: %w", err)
 		}
 
 		req := api.VerifyRealPhoneRequest{
@@ -284,7 +284,7 @@ Examples:
 		cfg := GetConfig(cmd)
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("invalid ID: %v", err)
+			return fmt.Errorf("invalid ID: %w", err)
 		}
 
 		force, err := cmd.Flags().GetBool("force")

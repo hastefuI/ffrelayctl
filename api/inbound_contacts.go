@@ -1,12 +1,12 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -44,7 +44,7 @@ func (c *Client) UpdateInboundContact(ctx context.Context, id int, req UpdateInb
 	}
 
 	path := fmt.Sprintf("%s%d/", inboundContactsPath, id)
-	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}

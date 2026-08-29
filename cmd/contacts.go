@@ -56,7 +56,7 @@ Examples:
 		cfg := GetConfig(cmd)
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("invalid ID: %v", err)
+			return fmt.Errorf("invalid ID: %w", err)
 		}
 
 		var blocked *bool

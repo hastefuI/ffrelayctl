@@ -1,12 +1,12 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -68,7 +68,7 @@ func (c *Client) CreateRelayAddress(ctx context.Context, req CreateRelayAddressR
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	resp, err := c.Post(ctx, relayAddressesPath, strings.NewReader(string(jsonBody)))
+	resp, err := c.Post(ctx, relayAddressesPath, bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *Client) UpdateRelayAddress(ctx context.Context, id int, req UpdateRelay
 	}
 
 	path := fmt.Sprintf("%s%d/", relayAddressesPath, id)
-	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, bytes.NewReader(jsonBody))
 	if err != nil {
 		return nil, err
 	}

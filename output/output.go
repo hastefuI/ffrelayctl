@@ -48,7 +48,7 @@ func Fprint(w io.Writer, format string, v any) error {
 func printJSON(w io.Writer, v any) error {
 	data, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error formatting output: %v", err)
+		return fmt.Errorf("error formatting output: %w", err)
 	}
 	fmt.Fprintln(w, string(data))
 	return nil
