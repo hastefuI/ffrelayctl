@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -34,7 +35,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,numbers)
+		return output.Print(cfg.OutputFormat, numbers)
 	},
 }
 
@@ -77,7 +78,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,number)
+		return output.Print(cfg.OutputFormat, number)
 	},
 }
 
@@ -102,7 +103,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,suggestions)
+		return output.Print(cfg.OutputFormat, suggestions)
 	},
 }
 
@@ -133,7 +134,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,numbers)
+		return output.Print(cfg.OutputFormat, numbers)
 	},
 }
 
@@ -160,7 +161,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,phones)
+		return output.Print(cfg.OutputFormat, phones)
 	},
 }
 
@@ -190,7 +191,7 @@ Examples:
 
 		for _, phone := range phones {
 			if phone.ID == id {
-				return output.Print(cfg.OutputFormat,phone)
+				return output.Print(cfg.OutputFormat, phone)
 			}
 		}
 
@@ -220,13 +221,13 @@ Examples:
 		}
 		phone, err := cfg.Client.RegisterRealPhone(req)
 		if err != nil {
-			if apiErr, ok := err.(*api.APIError); ok {
+			if apiErr, ok := errors.AsType[*api.APIError](err); ok {
 				fmt.Fprintln(cmd.OutOrStdout(), apiErr.Body)
 				return nil
 			}
 			return err
 		}
-		return output.Print(cfg.OutputFormat,phone)
+		return output.Print(cfg.OutputFormat, phone)
 	},
 }
 
@@ -256,13 +257,13 @@ Examples:
 		}
 		phone, err := cfg.Client.VerifyRealPhone(id, req)
 		if err != nil {
-			if apiErr, ok := err.(*api.APIError); ok {
+			if apiErr, ok := errors.AsType[*api.APIError](err); ok {
 				fmt.Fprintln(cmd.OutOrStdout(), apiErr.Body)
 				return nil
 			}
 			return err
 		}
-		return output.Print(cfg.OutputFormat,phone)
+		return output.Print(cfg.OutputFormat, phone)
 	},
 }
 

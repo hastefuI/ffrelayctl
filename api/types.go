@@ -149,26 +149,26 @@ type PhoneNumberOption struct {
 }
 
 type RelayNumberSuggestions struct {
-	RealNum            *string             `json:"real_num"`
-	SamePrefixOptions  []PhoneNumberOption `json:"same_prefix_options"`
-	OtherAreasOptions  []PhoneNumberOption `json:"other_areas_options"`
-	SameAreaOptions    []PhoneNumberOption `json:"same_area_options"`
-	RandomOptions      []PhoneNumberOption `json:"random_options"`
+	RealNum           *string             `json:"real_num"`
+	SamePrefixOptions []PhoneNumberOption `json:"same_prefix_options"`
+	OtherAreasOptions []PhoneNumberOption `json:"other_areas_options"`
+	SameAreaOptions   []PhoneNumberOption `json:"same_area_options"`
+	RandomOptions     []PhoneNumberOption `json:"random_options"`
 }
 
 type InboundContact struct {
-	ID               int     `json:"id"`
-	RelayNumber      int     `json:"relay_number"`
-	InboundNumber    string  `json:"inbound_number"`
-	LastInboundDate  string  `json:"last_inbound_date"`
-	LastInboundType  string  `json:"last_inbound_type"`
-	NumCalls         int     `json:"num_calls"`
-	NumCallsBlocked  int     `json:"num_calls_blocked"`
-	LastCallDate     *string `json:"last_call_date"`
-	NumTexts         int     `json:"num_texts"`
-	NumTextsBlocked  int     `json:"num_texts_blocked"`
-	LastTextDate     *string `json:"last_text_date"`
-	Blocked          bool    `json:"blocked"`
+	ID              int     `json:"id"`
+	RelayNumber     int     `json:"relay_number"`
+	InboundNumber   string  `json:"inbound_number"`
+	LastInboundDate string  `json:"last_inbound_date"`
+	LastInboundType string  `json:"last_inbound_type"`
+	NumCalls        int     `json:"num_calls"`
+	NumCallsBlocked int     `json:"num_calls_blocked"`
+	LastCallDate    *string `json:"last_call_date"`
+	NumTexts        int     `json:"num_texts"`
+	NumTextsBlocked int     `json:"num_texts_blocked"`
+	LastTextDate    *string `json:"last_text_date"`
+	Blocked         bool    `json:"blocked"`
 }
 
 type UpdateInboundContactRequest struct {

@@ -34,7 +34,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,contacts)
+		return output.Print(cfg.OutputFormat, contacts)
 	},
 }
 
@@ -79,7 +79,7 @@ Examples:
 		if err != nil {
 			return err
 		}
-		return output.Print(cfg.OutputFormat,contact)
+		return output.Print(cfg.OutputFormat, contact)
 	},
 }
 

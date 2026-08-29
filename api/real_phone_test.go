@@ -18,9 +18,9 @@ func TestGetRealPhone(t *testing.T) {
 			{
 				ID:                   12040,
 				Number:               "+18001234567",
-				VerificationSentDate: stringPtr("2026-01-01T00:00:00Z"),
+				VerificationSentDate: new("2026-01-01T00:00:00Z"),
 				Verified:             true,
-				VerifiedDate:         stringPtr("2026-01-01T00:10:00Z"),
+				VerifiedDate:         new("2026-01-01T00:10:00Z"),
 				CountryCode:          "US",
 			},
 		})
@@ -57,7 +57,7 @@ func TestRegisterRealPhone(t *testing.T) {
 		responder := httpmock.NewJsonResponderOrPanic(201, RealPhone{
 			ID:                   12040,
 			Number:               "+18001234567",
-			VerificationSentDate: stringPtr("2026-01-01T00:00:00Z"),
+			VerificationSentDate: new("2026-01-01T00:00:00Z"),
 			Verified:             false,
 			VerifiedDate:         nil,
 			CountryCode:          "US",
@@ -101,9 +101,9 @@ func TestVerifyRealPhone(t *testing.T) {
 		responder := httpmock.NewJsonResponderOrPanic(200, RealPhone{
 			ID:                   12040,
 			Number:               "+18001234567",
-			VerificationSentDate: stringPtr("2026-01-01T00:00:00Z"),
+			VerificationSentDate: new("2026-01-01T00:00:00Z"),
 			Verified:             true,
-			VerifiedDate:         stringPtr("2026-01-01T00:10:00Z"),
+			VerifiedDate:         new("2026-01-01T00:10:00Z"),
 			CountryCode:          "US",
 		})
 		httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"realphone/12040/", responder)
@@ -159,8 +159,4 @@ func TestDeleteRealPhone(t *testing.T) {
 
 		assert.Error(t, err)
 	})
-}
-
-func stringPtr(s string) *string {
-	return &s
 }

@@ -1,4 +1,4 @@
-# ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE)
+# ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)](https://go.dev) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE)
 
 A CLI for [Firefox Relay](https://relay.firefox.com) written in Go.
 
@@ -31,7 +31,7 @@ Download, extract, and install the latest release for your platform from the [re
 
 ### Build From Source
 
-Clone this repository, and then:
+`ffrelayctl` requires Go 1.27 or newer. Clone this repository, and then:
 ```bash
 # Build
 $ go build -o ffrelayctl .
