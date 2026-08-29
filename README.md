@@ -22,7 +22,7 @@ Firefox Relay is a privacy service from Mozilla that provides email and phone nu
 
 ```bash
 $ brew tap hastefui/tap
-$ brew install ffrelayctl
+$ brew install --cask ffrelayctl
 ```
 
 ### Pre-built Binaries

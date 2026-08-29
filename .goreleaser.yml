@@ -1,5 +1,7 @@
 version: 2
 
+project_name: ffrelayctl
+
 before:
   hooks:
     - go vet ./...
@@ -9,6 +11,7 @@ before:
 builds:
   - id: ffrelayctl
     binary: ffrelayctl
+    main: .
     env:
       - CGO_ENABLED=0
     goos:
@@ -26,6 +29,8 @@ builds:
         goarch: arm64
       - goos: windows
         goarch: arm
+    flags:
+      - -trimpath
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -34,6 +39,11 @@ builds:
 
 archives:
   - id: default
+    ids:
+      - ffrelayctl
+    format_overrides:
+      - goos: windows
+        formats: [zip]
     name_template: >-
       {{ .ProjectName }}_
       {{- .Version }}_
@@ -43,14 +53,12 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    builds:
-      - ffrelayctl
     files:
       - README.md
       - LICENSE
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: checksums.txt
   algorithm: sha256
 
 snapshot:
@@ -81,14 +89,20 @@ changelog:
     - title: 'Other Changes'
       order: 999
 
-dockers:
-  - image_templates:
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}-amd64"
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-amd64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-amd64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-amd64"
-    use: buildx
+dockers_v2:
+  - id: ffrelayctl
+    ids:
+      - ffrelayctl
     dockerfile: Dockerfile
+    images:
+      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
+      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}"
+    tags:
+      - "{{ .Version }}"
+      - "latest"
+    platforms:
+      - linux/amd64
+      - linux/arm64
     extra_files:
       - go.mod
       - go.sum
@@ -96,85 +110,41 @@ dockers:
       - api
       - cmd
       - output
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=Firefox Relay CLI - Manage email and phone masks"
-      - "--label=org.opencontainers.image.url=https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
-      - "--label=org.opencontainers.image.source=https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-    goos: linux
-    goarch: amd64
-  - image_templates:
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}-arm64"
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-arm64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-arm64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-arm64"
-    use: buildx
-    dockerfile: Dockerfile
-    extra_files:
-      - go.mod
-      - go.sum
-      - main.go
-      - api
-      - cmd
-      - output
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=Firefox Relay CLI - Manage email and phone masks"
-      - "--label=org.opencontainers.image.url=https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
-      - "--label=org.opencontainers.image.source=https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-    goos: linux
-    goarch: arm64
+    annotations:
+      "index,manifest:org.opencontainers.image.title": "{{ .ProjectName }}"
+      "index,manifest:org.opencontainers.image.description": "Firefox Relay CLI - Manage email and phone masks"
+      "index,manifest:org.opencontainers.image.url": "https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
+      "index,manifest:org.opencontainers.image.source": "https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
+      "index,manifest:org.opencontainers.image.version": "{{ .Version }}"
+      "index,manifest:org.opencontainers.image.created": "{{ .Date }}"
+      "index,manifest:org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "index,manifest:org.opencontainers.image.licenses": "MIT"
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.description: "Firefox Relay CLI - Manage email and phone masks"
+      org.opencontainers.image.url: "https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
+      org.opencontainers.image.source: "https://github.com/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.licenses: "MIT"
 
-docker_manifests:
-  - name_template: "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}"
-    image_templates:
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}-amd64"
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:{{ .Version }}-arm64"
-
-  - name_template: "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest"
-    image_templates:
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-amd64"
-      - "ghcr.io/{{ .Env.GORELEASER_REPO_OWNER }}/{{ .ProjectName }}:latest-arm64"
-
-  - name_template: "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}"
-    image_templates:
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-amd64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:{{ .Version }}-arm64"
-
-  - name_template: "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest"
-    image_templates:
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-amd64"
-      - "{{ .Env.DOCKERHUB_USERNAME }}/{{ .ProjectName }}:latest-arm64"
-
-brews:
-  - repository:
+homebrew_casks:
+  - name: ffrelayctl
+    repository:
       owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
       name: homebrew-tap
       branch: main
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    directory: Formula
+    directory: Casks
     commit_author:
       name: "{{ .Env.HOMEBREW_TAP_PUBLISHER_NAME }}"
       email: "{{ .Env.HOMEBREW_TAP_PUBLISHER_EMAIL }}"
-    commit_msg_template: "chore(brew): update formula for {{ .ProjectName }} {{ .Tag }}"
-    name: ffrelayctl
+    commit_msg_template: "chore(brew): update cask for {{ .ProjectName }} {{ .Tag }}"
     homepage: "https://github.com/hastefuI/ffrelayctl"
     description: "A CLI for Firefox Relay"
-    license: "MIT"
-    install: |
-      bin.install "ffrelayctl"
-    test: |
-      system "#{bin}/ffrelayctl", "--version"
+    binaries:
+      - ffrelayctl
 
 release:
   draft: false
