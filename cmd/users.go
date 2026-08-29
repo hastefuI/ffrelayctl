@@ -20,7 +20,7 @@ Examples:
   ffrelayctl users list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
-		users, err := cfg.Client.ListUsers()
+		users, err := cfg.Client.ListUsers(cfg.Ctx)
 		if err != nil {
 			return err
 		}

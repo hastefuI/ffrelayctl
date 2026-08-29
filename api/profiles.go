@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -10,8 +11,8 @@ const (
 	profilesPath = APIBasePath + "profiles/"
 )
 
-func (c *Client) GetProfiles() ([]Profile, error) {
-	resp, err := c.Get(profilesPath)
+func (c *Client) GetProfiles(ctx context.Context) ([]Profile, error) {
+	resp, err := c.Get(ctx, profilesPath)
 	if err != nil {
 		return nil, err
 	}

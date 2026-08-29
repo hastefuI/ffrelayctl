@@ -93,7 +93,6 @@ var rootCmd = &cobra.Command{
 		}
 		opts = append(opts, api.WithTimeout(cfg.Timeout))
 		opts = append(opts, api.WithUserAgent("ffrelayctl/"+cfg.VersionInfo.Version))
-		opts = append(opts, api.WithContext(cfg.Ctx))
 		cfg.Client = api.NewClient(cfg.APIKey, opts...)
 
 		return nil

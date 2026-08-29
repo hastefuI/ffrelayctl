@@ -39,14 +39,14 @@ Examples:
 		)
 
 		wg.Go(func() {
-			relayAddresses, err := cfg.Client.ListRelayAddresses()
+			relayAddresses, err := cfg.Client.ListRelayAddresses(cfg.Ctx)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("failed to fetch relay addresses: %w", err))
 				mu.Unlock()
 				return
 			}
-			domainAddresses, err := cfg.Client.ListDomainAddresses()
+			domainAddresses, err := cfg.Client.ListDomainAddresses(cfg.Ctx)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("failed to fetch domain addresses: %w", err))
@@ -68,7 +68,7 @@ Examples:
 		})
 
 		wg.Go(func() {
-			numbers, err := cfg.Client.ListRelayNumbers()
+			numbers, err := cfg.Client.ListRelayNumbers(cfg.Ctx)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("failed to fetch relay numbers: %w", err))
@@ -81,7 +81,7 @@ Examples:
 		})
 
 		wg.Go(func() {
-			profiles, err := cfg.Client.GetProfiles()
+			profiles, err := cfg.Client.GetProfiles(cfg.Ctx)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("failed to fetch profiles: %w", err))
@@ -94,7 +94,7 @@ Examples:
 		})
 
 		wg.Go(func() {
-			contacts, err := cfg.Client.ListInboundContacts()
+			contacts, err := cfg.Client.ListInboundContacts(cfg.Ctx)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("failed to fetch inbound contacts: %w", err))
@@ -107,7 +107,7 @@ Examples:
 		})
 
 		wg.Go(func() {
-			users, err := cfg.Client.ListUsers()
+			users, err := cfg.Client.ListUsers(cfg.Ctx)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("failed to fetch users: %w", err))

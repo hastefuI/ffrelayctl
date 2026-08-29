@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,8 +13,8 @@ const (
 	relayAddressesPath = APIBasePath + "relayaddresses/"
 )
 
-func (c *Client) ListRelayAddresses() ([]RelayAddress, error) {
-	resp, err := c.Get(relayAddressesPath)
+func (c *Client) ListRelayAddresses(ctx context.Context) ([]RelayAddress, error) {
+	resp, err := c.Get(ctx, relayAddressesPath)
 	if err != nil {
 		return nil, err
 	}
@@ -36,9 +37,9 @@ func (c *Client) ListRelayAddresses() ([]RelayAddress, error) {
 	return addresses, nil
 }
 
-func (c *Client) GetRelayAddress(id int) (*RelayAddress, error) {
+func (c *Client) GetRelayAddress(ctx context.Context, id int) (*RelayAddress, error) {
 	path := fmt.Sprintf("%s%d/", relayAddressesPath, id)
-	resp, err := c.Get(path)
+	resp, err := c.Get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -61,13 +62,13 @@ func (c *Client) GetRelayAddress(id int) (*RelayAddress, error) {
 	return &address, nil
 }
 
-func (c *Client) CreateRelayAddress(req CreateRelayAddressRequest) (*RelayAddress, error) {
+func (c *Client) CreateRelayAddress(ctx context.Context, req CreateRelayAddressRequest) (*RelayAddress, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	resp, err := c.Post(relayAddressesPath, strings.NewReader(string(jsonBody)))
+	resp, err := c.Post(ctx, relayAddressesPath, strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +91,14 @@ func (c *Client) CreateRelayAddress(req CreateRelayAddressRequest) (*RelayAddres
 	return &address, nil
 }
 
-func (c *Client) UpdateRelayAddress(id int, req UpdateRelayAddressRequest) (*RelayAddress, error) {
+func (c *Client) UpdateRelayAddress(ctx context.Context, id int, req UpdateRelayAddressRequest) (*RelayAddress, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	path := fmt.Sprintf("%s%d/", relayAddressesPath, id)
-	resp, err := c.Patch(path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil, err
 	}
@@ -120,9 +121,9 @@ func (c *Client) UpdateRelayAddress(id int, req UpdateRelayAddressRequest) (*Rel
 	return &address, nil
 }
 
-func (c *Client) DeleteRelayAddress(id int) error {
+func (c *Client) DeleteRelayAddress(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s%d/", relayAddressesPath, id)
-	resp, err := c.Delete(path)
+	resp, err := c.Delete(ctx, path)
 	if err != nil {
 		return err
 	}

@@ -31,7 +31,7 @@ Examples:
   ffrelayctl phones list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
-		numbers, err := cfg.Client.ListRelayNumbers()
+		numbers, err := cfg.Client.ListRelayNumbers(cfg.Ctx)
 		if err != nil {
 			return err
 		}
@@ -74,7 +74,7 @@ Examples:
 			Enabled: enabled,
 		}
 
-		number, err := cfg.Client.UpdateRelayNumber(id, req)
+		number, err := cfg.Client.UpdateRelayNumber(cfg.Ctx, id, req)
 		if err != nil {
 			return err
 		}
@@ -99,7 +99,7 @@ Examples:
   ffrelayctl phones discover`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
-		suggestions, err := cfg.Client.GetRelayNumberSuggestions()
+		suggestions, err := cfg.Client.GetRelayNumberSuggestions(cfg.Ctx)
 		if err != nil {
 			return err
 		}
@@ -130,7 +130,7 @@ Examples:
 			return fmt.Errorf("--areacode flag is required")
 		}
 
-		numbers, err := cfg.Client.SearchRelayNumbers(areaCode)
+		numbers, err := cfg.Client.SearchRelayNumbers(cfg.Ctx, areaCode)
 		if err != nil {
 			return err
 		}
@@ -157,7 +157,7 @@ Examples:
   ffrelayctl phones forward list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
-		phones, err := cfg.Client.GetRealPhone()
+		phones, err := cfg.Client.GetRealPhone(cfg.Ctx)
 		if err != nil {
 			return err
 		}
@@ -184,7 +184,7 @@ Examples:
 			return fmt.Errorf("invalid ID: %v", err)
 		}
 
-		phones, err := cfg.Client.GetRealPhone()
+		phones, err := cfg.Client.GetRealPhone(cfg.Ctx)
 		if err != nil {
 			return err
 		}
@@ -219,7 +219,7 @@ Examples:
 		req := api.RegisterRealPhoneRequest{
 			Number: args[0],
 		}
-		phone, err := cfg.Client.RegisterRealPhone(req)
+		phone, err := cfg.Client.RegisterRealPhone(cfg.Ctx, req)
 		if err != nil {
 			if apiErr, ok := errors.AsType[*api.APIError](err); ok {
 				fmt.Fprintln(cmd.OutOrStdout(), apiErr.Body)
@@ -255,7 +255,7 @@ Examples:
 			Number:           args[1],
 			VerificationCode: args[2],
 		}
-		phone, err := cfg.Client.VerifyRealPhone(id, req)
+		phone, err := cfg.Client.VerifyRealPhone(cfg.Ctx, id, req)
 		if err != nil {
 			if apiErr, ok := errors.AsType[*api.APIError](err); ok {
 				fmt.Fprintln(cmd.OutOrStdout(), apiErr.Body)
@@ -306,7 +306,7 @@ Examples:
 			}
 		}
 
-		if err := cfg.Client.DeleteRealPhone(id); err != nil {
+		if err := cfg.Client.DeleteRealPhone(cfg.Ctx, id); err != nil {
 			return err
 		}
 		fmt.Printf("Forwarding number %d deleted successfully.\n", id)

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,8 +13,8 @@ const (
 	domainAddressesPath = APIBasePath + "domainaddresses/"
 )
 
-func (c *Client) ListDomainAddresses() ([]DomainAddress, error) {
-	resp, err := c.Get(domainAddressesPath)
+func (c *Client) ListDomainAddresses(ctx context.Context) ([]DomainAddress, error) {
+	resp, err := c.Get(ctx, domainAddressesPath)
 	if err != nil {
 		return nil, err
 	}
@@ -36,9 +37,9 @@ func (c *Client) ListDomainAddresses() ([]DomainAddress, error) {
 	return addresses, nil
 }
 
-func (c *Client) GetDomainAddress(id int) (*DomainAddress, error) {
+func (c *Client) GetDomainAddress(ctx context.Context, id int) (*DomainAddress, error) {
 	path := fmt.Sprintf("%s%d/", domainAddressesPath, id)
-	resp, err := c.Get(path)
+	resp, err := c.Get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -61,13 +62,13 @@ func (c *Client) GetDomainAddress(id int) (*DomainAddress, error) {
 	return &address, nil
 }
 
-func (c *Client) CreateDomainAddress(req CreateDomainAddressRequest) (*DomainAddress, error) {
+func (c *Client) CreateDomainAddress(ctx context.Context, req CreateDomainAddressRequest) (*DomainAddress, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	resp, err := c.Post(domainAddressesPath, strings.NewReader(string(jsonBody)))
+	resp, err := c.Post(ctx, domainAddressesPath, strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +91,14 @@ func (c *Client) CreateDomainAddress(req CreateDomainAddressRequest) (*DomainAdd
 	return &address, nil
 }
 
-func (c *Client) UpdateDomainAddress(id int, req UpdateDomainAddressRequest) (*DomainAddress, error) {
+func (c *Client) UpdateDomainAddress(ctx context.Context, id int, req UpdateDomainAddressRequest) (*DomainAddress, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	path := fmt.Sprintf("%s%d/", domainAddressesPath, id)
-	resp, err := c.Patch(path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil, err
 	}
@@ -120,9 +121,9 @@ func (c *Client) UpdateDomainAddress(id int, req UpdateDomainAddressRequest) (*D
 	return &address, nil
 }
 
-func (c *Client) DeleteDomainAddress(id int) error {
+func (c *Client) DeleteDomainAddress(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s%d/", domainAddressesPath, id)
-	resp, err := c.Delete(path)
+	resp, err := c.Delete(ctx, path)
 	if err != nil {
 		return err
 	}

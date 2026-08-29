@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -8,8 +9,8 @@ import (
 
 const usersPath = APIBasePath + "users/"
 
-func (c *Client) ListUsers() ([]User, error) {
-	resp, err := c.Get(usersPath)
+func (c *Client) ListUsers(ctx context.Context) ([]User, error) {
+	resp, err := c.Get(ctx, usersPath)
 	if err != nil {
 		return nil, err
 	}

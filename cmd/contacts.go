@@ -30,7 +30,7 @@ Examples:
   ffrelayctl contacts list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
-		contacts, err := cfg.Client.ListInboundContacts()
+		contacts, err := cfg.Client.ListInboundContacts(cfg.Ctx)
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ Examples:
 			Blocked: blocked,
 		}
 
-		contact, err := cfg.Client.UpdateInboundContact(id, req)
+		contact, err := cfg.Client.UpdateInboundContact(cfg.Ctx, id, req)
 		if err != nil {
 			return err
 		}

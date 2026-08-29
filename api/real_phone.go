@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,8 +11,8 @@ import (
 
 const realPhonePath = APIBasePath + "realphone/"
 
-func (c *Client) GetRealPhone() ([]RealPhone, error) {
-	resp, err := c.Get(realPhonePath)
+func (c *Client) GetRealPhone(ctx context.Context) ([]RealPhone, error) {
+	resp, err := c.Get(ctx, realPhonePath)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +35,13 @@ func (c *Client) GetRealPhone() ([]RealPhone, error) {
 	return phones, nil
 }
 
-func (c *Client) RegisterRealPhone(req RegisterRealPhoneRequest) (*RealPhone, error) {
+func (c *Client) RegisterRealPhone(ctx context.Context, req RegisterRealPhoneRequest) (*RealPhone, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.Post(realPhonePath, bytes.NewReader(data))
+	resp, err := c.Post(ctx, realPhonePath, bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
@@ -63,14 +64,14 @@ func (c *Client) RegisterRealPhone(req RegisterRealPhoneRequest) (*RealPhone, er
 	return &phone, nil
 }
 
-func (c *Client) VerifyRealPhone(id int, req VerifyRealPhoneRequest) (*RealPhone, error) {
+func (c *Client) VerifyRealPhone(ctx context.Context, id int, req VerifyRealPhoneRequest) (*RealPhone, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
 	verifyPath := fmt.Sprintf("%s%d/", realPhonePath, id)
-	resp, err := c.Patch(verifyPath, bytes.NewReader(data))
+	resp, err := c.Patch(ctx, verifyPath, bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +94,9 @@ func (c *Client) VerifyRealPhone(id int, req VerifyRealPhoneRequest) (*RealPhone
 	return &phone, nil
 }
 
-func (c *Client) DeleteRealPhone(id int) error {
+func (c *Client) DeleteRealPhone(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s%d/", realPhonePath, id)
-	resp, err := c.Delete(path)
+	resp, err := c.Delete(ctx, path)
 	if err != nil {
 		return err
 	}

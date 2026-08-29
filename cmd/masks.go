@@ -75,11 +75,11 @@ Examples:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
 		if randomMask == nil {
-			relayAddresses, err := cfg.Client.ListRelayAddresses()
+			relayAddresses, err := cfg.Client.ListRelayAddresses(cfg.Ctx)
 			if err != nil {
 				return err
 			}
-			domainAddresses, err := cfg.Client.ListDomainAddresses()
+			domainAddresses, err := cfg.Client.ListDomainAddresses(cfg.Ctx)
 			if err != nil {
 				return err
 			}
@@ -96,13 +96,13 @@ Examples:
 		}
 
 		if *randomMask {
-			addresses, err := cfg.Client.ListRelayAddresses()
+			addresses, err := cfg.Client.ListRelayAddresses(cfg.Ctx)
 			if err != nil {
 				return err
 			}
 			return output.Print(cfg.OutputFormat, addresses)
 		} else {
-			addresses, err := cfg.Client.ListDomainAddresses()
+			addresses, err := cfg.Client.ListDomainAddresses(cfg.Ctx)
 			if err != nil {
 				return err
 			}
@@ -132,13 +132,13 @@ Examples:
 
 		if randomMask != nil {
 			if *randomMask {
-				address, err := cfg.Client.GetRelayAddress(id)
+				address, err := cfg.Client.GetRelayAddress(cfg.Ctx, id)
 				if err != nil {
 					return err
 				}
 				return output.Print(cfg.OutputFormat, address)
 			} else {
-				address, err := cfg.Client.GetDomainAddress(id)
+				address, err := cfg.Client.GetDomainAddress(cfg.Ctx, id)
 				if err != nil {
 					return err
 				}
@@ -146,18 +146,18 @@ Examples:
 			}
 		}
 
-		address, err := cfg.Client.GetRelayAddress(id)
+		address, err := cfg.Client.GetRelayAddress(cfg.Ctx, id)
 		if err == nil {
 			return output.Print(cfg.OutputFormat, address)
 		}
 
-		profiles, profileErr := cfg.Client.GetProfiles()
+		profiles, profileErr := cfg.Client.GetProfiles(cfg.Ctx)
 		if profileErr != nil {
 			return err
 		}
 
 		if len(profiles) > 0 && profiles[0].HasPremium {
-			domainAddress, domainErr := cfg.Client.GetDomainAddress(id)
+			domainAddress, domainErr := cfg.Client.GetDomainAddress(cfg.Ctx, id)
 			if domainErr == nil {
 				return output.Print(cfg.OutputFormat, domainAddress)
 			}
@@ -210,7 +210,7 @@ For custom domain masks (--random=false, Premium required):
 				BlockListEmails: blockList,
 			}
 
-			address, err := cfg.Client.CreateRelayAddress(req)
+			address, err := cfg.Client.CreateRelayAddress(cfg.Ctx, req)
 			if err != nil {
 				return err
 			}
@@ -231,7 +231,7 @@ For custom domain masks (--random=false, Premium required):
 				BlockListEmails: blockList,
 			}
 
-			domainAddress, err := cfg.Client.CreateDomainAddress(req)
+			domainAddress, err := cfg.Client.CreateDomainAddress(cfg.Ctx, req)
 			if err != nil {
 				return err
 			}
@@ -276,7 +276,7 @@ Examples:
 				req.UsedOn = &usedOn
 			}
 
-			address, err := cfg.Client.UpdateRelayAddress(id, req)
+			address, err := cfg.Client.UpdateRelayAddress(cfg.Ctx, id, req)
 			if err != nil {
 				return err
 			}
@@ -288,7 +288,7 @@ Examples:
 				BlockListEmails: fields.blockListEmails,
 			}
 
-			address, err := cfg.Client.UpdateDomainAddress(id, req)
+			address, err := cfg.Client.UpdateDomainAddress(cfg.Ctx, id, req)
 			if err != nil {
 				return err
 			}
@@ -339,12 +339,12 @@ Examples:
 		}
 
 		if randomMask == nil || *randomMask {
-			if err := cfg.Client.DeleteRelayAddress(id); err != nil {
+			if err := cfg.Client.DeleteRelayAddress(cfg.Ctx, id); err != nil {
 				return err
 			}
 			fmt.Printf("Random mask %d deleted successfully.\n", id)
 		} else {
-			if err := cfg.Client.DeleteDomainAddress(id); err != nil {
+			if err := cfg.Client.DeleteDomainAddress(cfg.Ctx, id); err != nil {
 				return err
 			}
 			fmt.Printf("Custom domain mask %d deleted successfully.\n", id)

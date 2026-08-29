@@ -83,7 +83,7 @@ func TestClient_ListRelayAddresses(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			addresses, err := client.ListRelayAddresses()
+			addresses, err := client.ListRelayAddresses(t.Context())
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListRelayAddresses() error = %v, wantErr %v", err, tt.wantErr)
@@ -167,7 +167,7 @@ func TestClient_GetRelayAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			address, err := client.GetRelayAddress(tt.id)
+			address, err := client.GetRelayAddress(t.Context(), tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetRelayAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -252,7 +252,7 @@ func TestClient_CreateRelayAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			address, err := client.CreateRelayAddress(tt.request)
+			address, err := client.CreateRelayAddress(t.Context(), tt.request)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateRelayAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -339,7 +339,7 @@ func TestClient_UpdateRelayAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			address, err := client.UpdateRelayAddress(tt.id, tt.request)
+			address, err := client.UpdateRelayAddress(t.Context(), tt.id, tt.request)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateRelayAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -392,7 +392,7 @@ func TestClient_DeleteRelayAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			err := client.DeleteRelayAddress(tt.id)
+			err := client.DeleteRelayAddress(t.Context(), tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DeleteRelayAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -412,7 +412,7 @@ func TestClient_ListRelayAddresses_InvalidJSON(t *testing.T) {
 	)
 
 	client := NewClient("test")
-	_, err := client.ListRelayAddresses()
+	_, err := client.ListRelayAddresses(t.Context())
 
 	if err == nil {
 		t.Error("ListRelayAddresses() expected error for invalid JSON, got nil")

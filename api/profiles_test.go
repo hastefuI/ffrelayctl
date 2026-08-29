@@ -111,7 +111,7 @@ func TestClient_GetProfiles(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			profiles, err := client.GetProfiles()
+			profiles, err := client.GetProfiles(t.Context())
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetProfiles() error = %v, wantErr %v", err, tt.wantErr)
@@ -141,7 +141,7 @@ func TestClient_GetProfiles_InvalidJSON(t *testing.T) {
 	)
 
 	client := NewClient("test")
-	_, err := client.GetProfiles()
+	_, err := client.GetProfiles(t.Context())
 
 	if err == nil {
 		t.Error("GetProfiles() expected error for invalid JSON, got nil")

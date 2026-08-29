@@ -26,7 +26,7 @@ func TestGetRealPhone(t *testing.T) {
 		})
 		httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"realphone/", responder)
 
-		phones, err := client.GetRealPhone()
+		phones, err := client.GetRealPhone(t.Context())
 
 		assert.NoError(t, err)
 		assert.Len(t, phones, 1)
@@ -40,7 +40,7 @@ func TestGetRealPhone(t *testing.T) {
 		responder := httpmock.NewStringResponder(400, `{"error": "bad request"}`)
 		httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"realphone/", responder)
 
-		phones, err := client.GetRealPhone()
+		phones, err := client.GetRealPhone(t.Context())
 
 		assert.Error(t, err)
 		assert.Nil(t, phones)
@@ -67,7 +67,7 @@ func TestRegisterRealPhone(t *testing.T) {
 		req := RegisterRealPhoneRequest{
 			Number: "+18001234567",
 		}
-		phone, err := client.RegisterRealPhone(req)
+		phone, err := client.RegisterRealPhone(t.Context(), req)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, phone)
@@ -84,7 +84,7 @@ func TestRegisterRealPhone(t *testing.T) {
 		req := RegisterRealPhoneRequest{
 			Number: "invalid",
 		}
-		phone, err := client.RegisterRealPhone(req)
+		phone, err := client.RegisterRealPhone(t.Context(), req)
 
 		assert.Error(t, err)
 		assert.Nil(t, phone)
@@ -112,7 +112,7 @@ func TestVerifyRealPhone(t *testing.T) {
 			Number:           "+18001234567",
 			VerificationCode: "123456",
 		}
-		phone, err := client.VerifyRealPhone(12040, req)
+		phone, err := client.VerifyRealPhone(t.Context(), 12040, req)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, phone)
@@ -129,7 +129,7 @@ func TestVerifyRealPhone(t *testing.T) {
 			Number:           "+18001234567",
 			VerificationCode: "000000",
 		}
-		phone, err := client.VerifyRealPhone(12040, req)
+		phone, err := client.VerifyRealPhone(t.Context(), 12040, req)
 
 		assert.Error(t, err)
 		assert.Nil(t, phone)
@@ -146,7 +146,7 @@ func TestDeleteRealPhone(t *testing.T) {
 		responder := httpmock.NewStringResponder(204, "")
 		httpmock.RegisterResponder("DELETE", DefaultBaseURL+APIBasePath+"realphone/12040/", responder)
 
-		err := client.DeleteRealPhone(12040)
+		err := client.DeleteRealPhone(t.Context(), 12040)
 
 		assert.NoError(t, err)
 	})
@@ -155,7 +155,7 @@ func TestDeleteRealPhone(t *testing.T) {
 		responder := httpmock.NewStringResponder(404, `{"error": "not found"}`)
 		httpmock.RegisterResponder("DELETE", DefaultBaseURL+APIBasePath+"realphone/99999/", responder)
 
-		err := client.DeleteRealPhone(99999)
+		err := client.DeleteRealPhone(t.Context(), 99999)
 
 		assert.Error(t, err)
 	})

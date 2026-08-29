@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,8 +13,8 @@ const (
 	relayNumbersPath = APIBasePath + "relaynumber/"
 )
 
-func (c *Client) ListRelayNumbers() ([]RelayNumber, error) {
-	resp, err := c.Get(relayNumbersPath)
+func (c *Client) ListRelayNumbers(ctx context.Context) ([]RelayNumber, error) {
+	resp, err := c.Get(ctx, relayNumbersPath)
 	if err != nil {
 		return nil, err
 	}
@@ -36,9 +37,9 @@ func (c *Client) ListRelayNumbers() ([]RelayNumber, error) {
 	return numbers, nil
 }
 
-func (c *Client) GetRelayNumberSuggestions() (*RelayNumberSuggestions, error) {
+func (c *Client) GetRelayNumberSuggestions(ctx context.Context) (*RelayNumberSuggestions, error) {
 	path := relayNumbersPath + "suggestions/"
-	resp, err := c.Get(path)
+	resp, err := c.Get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +71,9 @@ func (c *Client) GetRelayNumberSuggestions() (*RelayNumberSuggestions, error) {
 	return &suggestions, nil
 }
 
-func (c *Client) SearchRelayNumbers(areaCode string) ([]PhoneNumberOption, error) {
+func (c *Client) SearchRelayNumbers(ctx context.Context, areaCode string) ([]PhoneNumberOption, error) {
 	path := fmt.Sprintf("%ssearch/?area_code=%s", relayNumbersPath, areaCode)
-	resp, err := c.Get(path)
+	resp, err := c.Get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -99,14 +100,14 @@ func (c *Client) SearchRelayNumbers(areaCode string) ([]PhoneNumberOption, error
 	return numbers, nil
 }
 
-func (c *Client) UpdateRelayNumber(id int, req UpdateRelayNumberRequest) (*RelayNumber, error) {
+func (c *Client) UpdateRelayNumber(ctx context.Context, id int, req UpdateRelayNumberRequest) (*RelayNumber, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	path := fmt.Sprintf("%s%d/", relayNumbersPath, id)
-	resp, err := c.Patch(path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil, err
 	}

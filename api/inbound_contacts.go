@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,8 +13,8 @@ const (
 	inboundContactsPath = APIBasePath + "inboundcontact/"
 )
 
-func (c *Client) ListInboundContacts() ([]InboundContact, error) {
-	resp, err := c.Get(inboundContactsPath)
+func (c *Client) ListInboundContacts(ctx context.Context) ([]InboundContact, error) {
+	resp, err := c.Get(ctx, inboundContactsPath)
 	if err != nil {
 		return nil, err
 	}
@@ -36,14 +37,14 @@ func (c *Client) ListInboundContacts() ([]InboundContact, error) {
 	return contacts, nil
 }
 
-func (c *Client) UpdateInboundContact(id int, req UpdateInboundContactRequest) (*InboundContact, error) {
+func (c *Client) UpdateInboundContact(ctx context.Context, id int, req UpdateInboundContactRequest) (*InboundContact, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	path := fmt.Sprintf("%s%d/", inboundContactsPath, id)
-	resp, err := c.Patch(path, strings.NewReader(string(jsonBody)))
+	resp, err := c.Patch(ctx, path, strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil, err
 	}

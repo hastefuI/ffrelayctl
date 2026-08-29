@@ -113,7 +113,7 @@ func TestClient_ListInboundContacts(t *testing.T) {
 			httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"inboundcontact/",
 				httpmock.NewStringResponder(tt.mockStatusCode, tt.mockResponse))
 
-			contacts, err := client.ListInboundContacts()
+			contacts, err := client.ListInboundContacts(t.Context())
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListInboundContacts() error = %v, wantErr %v", err, tt.wantErr)
@@ -156,7 +156,7 @@ func TestClient_ListInboundContacts_InvalidJSON(t *testing.T) {
 	httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"inboundcontact/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
-	_, err := client.ListInboundContacts()
+	_, err := client.ListInboundContacts(t.Context())
 	if err == nil {
 		t.Error("ListInboundContacts() expected error for invalid JSON, got nil")
 	}
@@ -265,7 +265,7 @@ func TestClient_UpdateInboundContact(t *testing.T) {
 			httpmock.RegisterResponder("PATCH", url,
 				httpmock.NewStringResponder(tt.mockStatusCode, tt.mockResponse))
 
-			contact, err := client.UpdateInboundContact(tt.contactID, tt.request)
+			contact, err := client.UpdateInboundContact(t.Context(), tt.contactID, tt.request)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateInboundContact() error = %v, wantErr %v", err, tt.wantErr)
@@ -302,7 +302,7 @@ func TestClient_UpdateInboundContact_InvalidJSON(t *testing.T) {
 	httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"inboundcontact/1/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
-	_, err := client.UpdateInboundContact(1, UpdateInboundContactRequest{Blocked: new(true)})
+	_, err := client.UpdateInboundContact(t.Context(), 1, UpdateInboundContactRequest{Blocked: new(true)})
 	if err == nil {
 		t.Error("UpdateInboundContact() expected error for invalid JSON, got nil")
 	}

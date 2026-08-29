@@ -21,7 +21,6 @@ type Client struct {
 	Token      string
 	UserAgent  string
 	HTTPClient *http.Client
-	ctx        context.Context
 }
 
 type ClientOption func(*Client)
@@ -50,12 +49,6 @@ func WithUserAgent(userAgent string) ClientOption {
 	}
 }
 
-func WithContext(ctx context.Context) ClientOption {
-	return func(c *Client) {
-		c.ctx = ctx
-	}
-}
-
 func NewClient(token string, opts ...ClientOption) *Client {
 	c := &Client{
 		BaseURL: DefaultBaseURL,
@@ -63,7 +56,6 @@ func NewClient(token string, opts ...ClientOption) *Client {
 		HTTPClient: &http.Client{
 			Timeout: DefaultTimeout,
 		},
-		ctx: context.Background(),
 	}
 
 	for _, opt := range opts {
@@ -73,11 +65,7 @@ func NewClient(token string, opts ...ClientOption) *Client {
 	return c
 }
 
-func (c *Client) NewRequest(method, path string, body io.Reader) (*http.Request, error) {
-	return c.NewRequestWithContext(c.ctx, method, path, body)
-}
-
-func (c *Client) NewRequestWithContext(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
 	url := c.BaseURL + path
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
@@ -102,40 +90,40 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *Client) Get(path string) (*http.Response, error) {
-	req, err := c.NewRequest(http.MethodGet, path, nil)
+func (c *Client) Get(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
 	return c.Do(req)
 }
 
-func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
-	req, err := c.NewRequest(http.MethodPost, path, body)
+func (c *Client) Post(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, http.MethodPost, path, body)
 	if err != nil {
 		return nil, err
 	}
 	return c.Do(req)
 }
 
-func (c *Client) Put(path string, body io.Reader) (*http.Response, error) {
-	req, err := c.NewRequest(http.MethodPut, path, body)
+func (c *Client) Put(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, http.MethodPut, path, body)
 	if err != nil {
 		return nil, err
 	}
 	return c.Do(req)
 }
 
-func (c *Client) Patch(path string, body io.Reader) (*http.Response, error) {
-	req, err := c.NewRequest(http.MethodPatch, path, body)
+func (c *Client) Patch(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, http.MethodPatch, path, body)
 	if err != nil {
 		return nil, err
 	}
 	return c.Do(req)
 }
 
-func (c *Client) Delete(path string) (*http.Response, error) {
-	req, err := c.NewRequest(http.MethodDelete, path, nil)
+func (c *Client) Delete(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err
 	}

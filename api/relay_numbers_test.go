@@ -110,7 +110,7 @@ func TestClient_ListRelayNumbers(t *testing.T) {
 			httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"relaynumber/",
 				httpmock.NewStringResponder(tt.mockStatusCode, tt.mockResponse))
 
-			numbers, err := client.ListRelayNumbers()
+			numbers, err := client.ListRelayNumbers(t.Context())
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListRelayNumbers() error = %v, wantErr %v", err, tt.wantErr)
@@ -150,7 +150,7 @@ func TestClient_ListRelayNumbers_InvalidJSON(t *testing.T) {
 	httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"relaynumber/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
-	_, err := client.ListRelayNumbers()
+	_, err := client.ListRelayNumbers(t.Context())
 	if err == nil {
 		t.Error("ListRelayNumbers() expected error for invalid JSON, got nil")
 	}
@@ -261,7 +261,7 @@ func TestClient_UpdateRelayNumber(t *testing.T) {
 			httpmock.RegisterResponder("PATCH", url,
 				httpmock.NewStringResponder(tt.mockStatusCode, tt.mockResponse))
 
-			number, err := client.UpdateRelayNumber(tt.relayID, tt.request)
+			number, err := client.UpdateRelayNumber(t.Context(), tt.relayID, tt.request)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateRelayNumber() error = %v, wantErr %v", err, tt.wantErr)
@@ -299,7 +299,7 @@ func TestClient_UpdateRelayNumber_InvalidJSON(t *testing.T) {
 	httpmock.RegisterResponder("PATCH", DefaultBaseURL+APIBasePath+"relaynumber/1/",
 		httpmock.NewStringResponder(http.StatusOK, `invalid json`))
 
-	_, err := client.UpdateRelayNumber(1, UpdateRelayNumberRequest{Enabled: new(false)})
+	_, err := client.UpdateRelayNumber(t.Context(), 1, UpdateRelayNumberRequest{Enabled: new(false)})
 	if err == nil {
 		t.Error("UpdateRelayNumber() expected error for invalid JSON, got nil")
 	}

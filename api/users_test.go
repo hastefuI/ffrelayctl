@@ -20,7 +20,7 @@ func TestListUsers(t *testing.T) {
 		})
 		httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"users/", responder)
 
-		users, err := client.ListUsers()
+		users, err := client.ListUsers(t.Context())
 
 		assert.NoError(t, err)
 		assert.Len(t, users, 2)
@@ -32,7 +32,7 @@ func TestListUsers(t *testing.T) {
 		responder := httpmock.NewJsonResponderOrPanic(200, []User{})
 		httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"users/", responder)
 
-		users, err := client.ListUsers()
+		users, err := client.ListUsers(t.Context())
 
 		assert.NoError(t, err)
 		assert.Empty(t, users)
@@ -42,7 +42,7 @@ func TestListUsers(t *testing.T) {
 		responder := httpmock.NewStringResponder(500, `{"error": "internal server error"}`)
 		httpmock.RegisterResponder("GET", DefaultBaseURL+APIBasePath+"users/", responder)
 
-		users, err := client.ListUsers()
+		users, err := client.ListUsers(t.Context())
 
 		assert.Error(t, err)
 		assert.Nil(t, users)

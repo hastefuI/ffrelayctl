@@ -88,7 +88,7 @@ func TestClient_ListDomainAddresses(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			addresses, err := client.ListDomainAddresses()
+			addresses, err := client.ListDomainAddresses(t.Context())
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListDomainAddresses() error = %v, wantErr %v", err, tt.wantErr)
@@ -172,7 +172,7 @@ func TestClient_GetDomainAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			address, err := client.GetDomainAddress(tt.id)
+			address, err := client.GetDomainAddress(t.Context(), tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetDomainAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -266,7 +266,7 @@ func TestClient_CreateDomainAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			address, err := client.CreateDomainAddress(tt.request)
+			address, err := client.CreateDomainAddress(t.Context(), tt.request)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateDomainAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -354,7 +354,7 @@ func TestClient_UpdateDomainAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			address, err := client.UpdateDomainAddress(tt.id, tt.request)
+			address, err := client.UpdateDomainAddress(t.Context(), tt.id, tt.request)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateDomainAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -407,7 +407,7 @@ func TestClient_DeleteDomainAddress(t *testing.T) {
 			)
 
 			client := NewClient("test")
-			err := client.DeleteDomainAddress(tt.id)
+			err := client.DeleteDomainAddress(t.Context(), tt.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DeleteDomainAddress() error = %v, wantErr %v", err, tt.wantErr)
@@ -427,7 +427,7 @@ func TestClient_ListDomainAddresses_InvalidJSON(t *testing.T) {
 	)
 
 	client := NewClient("test")
-	_, err := client.ListDomainAddresses()
+	_, err := client.ListDomainAddresses(t.Context())
 
 	if err == nil {
 		t.Error("ListDomainAddresses() expected error for invalid JSON, got nil")
