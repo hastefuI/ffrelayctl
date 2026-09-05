@@ -8,23 +8,33 @@ import (
 )
 
 // Profile is a Firefox Relay account profile. It carries the subscription
-// state and the counters totalled across every mask on the account.
+// state and the counters totalled across every mask on the account. APIToken
+// is a live credential for the whole account.
 type Profile struct {
 	ID                          int          `json:"id"`
 	ServerStorage               bool         `json:"server_storage"`
+	StorePhoneLog               bool         `json:"store_phone_log"`
 	Subdomain                   *string      `json:"subdomain"`
 	HasPremium                  bool         `json:"has_premium"`
 	HasPhone                    bool         `json:"has_phone"`
+	HasVPN                      bool         `json:"has_vpn"`
+	HasMegabundle               bool         `json:"has_megabundle"`
 	OnboardingState             int          `json:"onboarding_state"`
+	OnboardingFreeState         int          `json:"onboarding_free_state"`
+	DatePhoneRegistered         *string      `json:"date_phone_registered"`
 	DateSubscribed              *string      `json:"date_subscribed"`
 	AvatarURL                   string       `json:"avatar"`
+	NextEmailTry                string       `json:"next_email_try"`
+	BounceStatus                BounceStatus `json:"bounce_status"`
+	APIToken                    string       `json:"api_token,omitempty"`
 	EmailsBlocked               int          `json:"emails_blocked"`
 	EmailsForwarded             int          `json:"emails_forwarded"`
 	EmailsReplied               int          `json:"emails_replied"`
 	LevelOneTrackersBlocked     int          `json:"level_one_trackers_blocked"`
 	RemoveLevelOneEmailTrackers bool         `json:"remove_level_one_email_trackers"`
+	TotalMasks                  int          `json:"total_masks"`
 	AtMaskLimit                 bool         `json:"at_mask_limit"`
-	BounceStatus                BounceStatus `json:"bounce_status"`
+	MetricsEnabled              bool         `json:"metrics_enabled"`
 }
 
 // BounceStatus reports whether email forwarding is paused because a message
@@ -68,21 +78,24 @@ func (b BounceStatus) MarshalJSON() ([]byte, error) {
 
 // RelayAddress is a random email mask and its forwarding counters.
 type RelayAddress struct {
-	ID              int     `json:"id"`
-	Address         string  `json:"address"`
-	Domain          int     `json:"domain"`
-	FullAddress     string  `json:"full_address"`
-	Enabled         bool    `json:"enabled"`
-	Description     string  `json:"description"`
-	GeneratedFor    string  `json:"generated_for"`
-	UsedOn          string  `json:"used_on"`
-	BlockListEmails bool    `json:"block_list_emails"`
-	CreatedAt       string  `json:"created_at"`
-	LastUsedAt      *string `json:"last_used_at"`
-	NumForwarded    int     `json:"num_forwarded"`
-	NumBlocked      int     `json:"num_blocked"`
-	NumReplied      int     `json:"num_replied"`
-	NumSpam         int     `json:"num_spam"`
+	ID                         int     `json:"id"`
+	MaskType                   string  `json:"mask_type"`
+	Address                    string  `json:"address"`
+	Domain                     int     `json:"domain"`
+	FullAddress                string  `json:"full_address"`
+	Enabled                    bool    `json:"enabled"`
+	Description                string  `json:"description"`
+	GeneratedFor               string  `json:"generated_for"`
+	UsedOn                     string  `json:"used_on"`
+	BlockListEmails            bool    `json:"block_list_emails"`
+	CreatedAt                  string  `json:"created_at"`
+	LastModifiedAt             string  `json:"last_modified_at"`
+	LastUsedAt                 *string `json:"last_used_at"`
+	NumForwarded               int     `json:"num_forwarded"`
+	NumBlocked                 int     `json:"num_blocked"`
+	NumLevelOneTrackersBlocked *int    `json:"num_level_one_trackers_blocked"`
+	NumReplied                 int     `json:"num_replied"`
+	NumSpam                    int     `json:"num_spam"`
 }
 
 // CreateRelayAddressRequest is the body for Client.CreateRelayAddress.
@@ -107,19 +120,23 @@ type UpdateRelayAddressRequest struct {
 // DomainAddress is an email mask on the account's own subdomain, which is a
 // premium feature, and its forwarding counters.
 type DomainAddress struct {
-	ID              int     `json:"id"`
-	Address         string  `json:"address"`
-	FullAddress     string  `json:"full_address"`
-	Enabled         bool    `json:"enabled"`
-	Description     string  `json:"description"`
-	UsedOn          string  `json:"used_on"`
-	BlockListEmails bool    `json:"block_list_emails"`
-	CreatedAt       string  `json:"created_at"`
-	LastUsedAt      *string `json:"last_used_at"`
-	NumForwarded    int     `json:"num_forwarded"`
-	NumBlocked      int     `json:"num_blocked"`
-	NumReplied      int     `json:"num_replied"`
-	NumSpam         int     `json:"num_spam"`
+	ID                         int     `json:"id"`
+	MaskType                   string  `json:"mask_type"`
+	Address                    string  `json:"address"`
+	Domain                     int     `json:"domain"`
+	FullAddress                string  `json:"full_address"`
+	Enabled                    bool    `json:"enabled"`
+	Description                string  `json:"description"`
+	UsedOn                     string  `json:"used_on"`
+	BlockListEmails            bool    `json:"block_list_emails"`
+	CreatedAt                  string  `json:"created_at"`
+	LastModifiedAt             string  `json:"last_modified_at"`
+	LastUsedAt                 *string `json:"last_used_at"`
+	NumForwarded               int     `json:"num_forwarded"`
+	NumBlocked                 int     `json:"num_blocked"`
+	NumLevelOneTrackersBlocked *int    `json:"num_level_one_trackers_blocked"`
+	NumReplied                 int     `json:"num_replied"`
+	NumSpam                    int     `json:"num_spam"`
 }
 
 // CreateDomainAddressRequest is the body for Client.CreateDomainAddress.
@@ -141,35 +158,21 @@ type UpdateDomainAddressRequest struct {
 }
 
 // MaskFilter narrows a mask listing to the masks that match every field set on
-// it. The zero value matches every mask.
-//
-// Relay matches UsedOn as a case-insensitive substring. Every other field is
-// matched exactly.
+// it. The zero value matches every mask. Relay matches UsedOn as a
+// case-insensitive substring and every other field exactly. GeneratedFor
+// applies to random masks only.
 type MaskFilter struct {
-	// Enabled keeps only the masks that forward mail (true) or only those
-	// that block it (false). A nil value keeps both.
-	Enabled *bool
-	// BlockListEmails keeps only the masks that block promotional mail (true)
-	// or only those that do not (false). A nil value keeps both.
+	Enabled         *bool
 	BlockListEmails *bool
-	// Address is the local part of a mask, so "abc123" for the mask
-	// abc123@mozmail.com. An empty value keeps every address.
-	Address string
-	// Description is the label put on a mask. An empty value keeps every
-	// description.
-	Description string
-	// GeneratedFor is the site a mask was generated for. Only random masks
-	// carry it, so it is left off when filtering masks on the account's own
-	// subdomain. An empty value keeps every mask.
-	GeneratedFor string
-	// UsedOn is the record of the sites a mask is used on, matched as a
-	// case-insensitive substring. An empty value keeps every mask.
-	UsedOn string
+	Address         string
+	Description     string
+	GeneratedFor    string
+	UsedOn          string
 }
 
-// query encodes the filter as a query string, prefixed with "?", and returns
-// an empty string when no field is set. generatedFor reports whether the
-// endpoint being called has a generated_for field to filter on.
+// query encodes the filter as a query string prefixed with "?", or an empty
+// string when no field is set. generatedFor reports whether the endpoint has a
+// generated_for field to filter on.
 func (f MaskFilter) query(generatedFor bool) string {
 	values := url.Values{}
 	if f.Enabled != nil {
@@ -200,19 +203,20 @@ func (f MaskFilter) query(generatedFor bool) string {
 // RelayNumber is a phone mask, with its call and text counters and the quota
 // left for the current month.
 type RelayNumber struct {
-	ID             int     `json:"id"`
-	Number         string  `json:"number"`
-	Enabled        bool    `json:"enabled"`
-	Location       string  `json:"location"`
-	VendorID       string  `json:"vendor_id"`
-	CountryCode    string  `json:"country_code"`
-	CreatedAt      *string `json:"created_at"`
-	RemainingText  int     `json:"remaining_texts"`
-	RemainingMin   int     `json:"remaining_minutes"`
-	CallsForwarded int     `json:"calls_forwarded"`
-	CallsBlocked   int     `json:"calls_blocked"`
-	TextsForwarded int     `json:"texts_forwarded"`
-	TextsBlocked   int     `json:"texts_blocked"`
+	ID                     int     `json:"id"`
+	Number                 string  `json:"number"`
+	Enabled                bool    `json:"enabled"`
+	Location               string  `json:"location"`
+	CountryCode            string  `json:"country_code"`
+	CreatedAt              *string `json:"created_at"`
+	RemainingText          int     `json:"remaining_texts"`
+	RemainingMin           int     `json:"remaining_minutes"`
+	CallsForwarded         int     `json:"calls_forwarded"`
+	CallsBlocked           int     `json:"calls_blocked"`
+	TextsForwarded         int     `json:"texts_forwarded"`
+	TextsBlocked           int     `json:"texts_blocked"`
+	CallsAndTextsForwarded int     `json:"calls_and_texts_forwarded"`
+	CallsAndTextsBlocked   int     `json:"calls_and_texts_blocked"`
 }
 
 // UpdateRelayNumberRequest is the body for Client.UpdateRelayNumber.

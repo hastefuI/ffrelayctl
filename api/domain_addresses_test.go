@@ -554,3 +554,48 @@ func TestClient_DomainAddress_UsedOnRequestBody(t *testing.T) {
 		}
 	})
 }
+
+func TestClient_ListDomainAddresses_FullSerializerFields(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+	httpmock.Reset()
+
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		DefaultBaseURL+domainAddressesPath,
+		httpmock.NewStringResponder(http.StatusOK, `[{
+			"id": 12345,
+			"mask_type": "custom",
+			"address": "godocs",
+			"domain": 2,
+			"full_address": "godocs@mysubdomain.mozmail.com",
+			"used_on": "go.dev",
+			"created_at": "2026-01-01T00:00:00Z",
+			"last_modified_at": "2026-02-01T00:00:00Z",
+			"num_level_one_trackers_blocked": null
+		}]`),
+	)
+
+	client := NewClient("test")
+	addresses, err := client.ListDomainAddresses(t.Context())
+	if err != nil {
+		t.Fatalf("ListDomainAddresses() error = %v", err)
+	}
+
+	a := addresses[0]
+	if a.MaskType != "custom" {
+		t.Errorf("DomainAddress MaskType = %s, want custom", a.MaskType)
+	}
+	if a.Domain != 2 {
+		t.Errorf("DomainAddress Domain = %d, want 2", a.Domain)
+	}
+	if a.UsedOn != "go.dev" {
+		t.Errorf("DomainAddress UsedOn = %s, want go.dev", a.UsedOn)
+	}
+	if a.LastModifiedAt != "2026-02-01T00:00:00Z" {
+		t.Errorf("DomainAddress LastModifiedAt = %s, want 2026-02-01T00:00:00Z", a.LastModifiedAt)
+	}
+	if a.NumLevelOneTrackersBlocked != nil {
+		t.Errorf("DomainAddress NumLevelOneTrackersBlocked = %v, want nil", a.NumLevelOneTrackersBlocked)
+	}
+}

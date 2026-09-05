@@ -304,3 +304,37 @@ func TestClient_UpdateRelayNumber_InvalidJSON(t *testing.T) {
 		t.Error("UpdateRelayNumber() expected error for invalid JSON, got nil")
 	}
 }
+
+func TestClient_ListRelayNumbers_CombinedCounters(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+	httpmock.Reset()
+
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		DefaultBaseURL+relayNumbersPath,
+		httpmock.NewStringResponder(http.StatusOK, `[{
+			"id": 1,
+			"number": "+13035556789",
+			"calls_forwarded": 3,
+			"calls_blocked": 1,
+			"texts_forwarded": 7,
+			"texts_blocked": 2,
+			"calls_and_texts_forwarded": 10,
+			"calls_and_texts_blocked": 3
+		}]`),
+	)
+
+	client := NewClient("test")
+	numbers, err := client.ListRelayNumbers(t.Context())
+	if err != nil {
+		t.Fatalf("ListRelayNumbers() error = %v", err)
+	}
+
+	if numbers[0].CallsAndTextsForwarded != 10 {
+		t.Errorf("RelayNumber CallsAndTextsForwarded = %d, want 10", numbers[0].CallsAndTextsForwarded)
+	}
+	if numbers[0].CallsAndTextsBlocked != 3 {
+		t.Errorf("RelayNumber CallsAndTextsBlocked = %d, want 3", numbers[0].CallsAndTextsBlocked)
+	}
+}

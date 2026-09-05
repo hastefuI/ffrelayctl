@@ -554,3 +554,46 @@ func TestClient_UpdateRelayAddress_RequestBody(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_ListRelayAddresses_FullSerializerFields(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+	httpmock.Reset()
+
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		DefaultBaseURL+relayAddressesPath,
+		httpmock.NewStringResponder(http.StatusOK, `[{
+			"id": 12345,
+			"mask_type": "random",
+			"address": "abc123",
+			"domain": 2,
+			"full_address": "abc123@mozmail.com",
+			"created_at": "2026-01-01T00:00:00Z",
+			"last_modified_at": "2026-02-01T00:00:00Z",
+			"num_level_one_trackers_blocked": 4
+		}, {
+			"id": 12346,
+			"num_level_one_trackers_blocked": null
+		}]`),
+	)
+
+	client := NewClient("test")
+	addresses, err := client.ListRelayAddresses(t.Context())
+	if err != nil {
+		t.Fatalf("ListRelayAddresses() error = %v", err)
+	}
+
+	if addresses[0].MaskType != "random" {
+		t.Errorf("RelayAddress MaskType = %s, want random", addresses[0].MaskType)
+	}
+	if addresses[0].LastModifiedAt != "2026-02-01T00:00:00Z" {
+		t.Errorf("RelayAddress LastModifiedAt = %s, want 2026-02-01T00:00:00Z", addresses[0].LastModifiedAt)
+	}
+	if addresses[0].NumLevelOneTrackersBlocked == nil || *addresses[0].NumLevelOneTrackersBlocked != 4 {
+		t.Errorf("RelayAddress NumLevelOneTrackersBlocked = %v, want 4", addresses[0].NumLevelOneTrackersBlocked)
+	}
+	if addresses[1].NumLevelOneTrackersBlocked != nil {
+		t.Errorf("RelayAddress NumLevelOneTrackersBlocked = %v, want nil", addresses[1].NumLevelOneTrackersBlocked)
+	}
+}

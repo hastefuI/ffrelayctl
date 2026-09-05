@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"go.hasteful.org/ffrelayctl/api"
@@ -412,14 +410,11 @@ Examples:
 		}
 
 		if !force {
-			fmt.Printf("Are you sure you want to delete %s %d? This cannot be undone. [y/N]: ", maskType, id)
-			reader := bufio.NewReader(os.Stdin)
-			response, err := reader.ReadString('\n')
+			confirmed, err := confirm(os.Stdout, fmt.Sprintf("Are you sure you want to delete %s %d? This cannot be undone. [y/N]: ", maskType, id))
 			if err != nil {
-				return fmt.Errorf("failed to read confirmation: %w", err)
+				return err
 			}
-			response = strings.TrimSpace(strings.ToLower(response))
-			if response != "y" && response != "yes" {
+			if !confirmed {
 				fmt.Println("Deletion cancelled.")
 				return nil
 			}

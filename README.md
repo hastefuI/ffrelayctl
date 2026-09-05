@@ -150,6 +150,10 @@ $ ffrelayctl phones list --output json | jq
 # List all phone numbers that have texted your Relay number
 $ ffrelayctl contacts list --output json | jq '[.[] | select(.last_inbound_type == "text")]'
 
+# Back up an account
+$ ffrelayctl export > ffrelay-backup.json
+$ ffrelayctl export --include-api-token > ffrelay-full-backup.json
+
 # List all masks using Docker
 $ docker run --rm -e FFRELAYCTL_KEY=<replace-me> ffrelayctl profiles list
 ```

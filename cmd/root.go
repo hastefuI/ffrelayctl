@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -35,6 +38,18 @@ type CmdConfig struct {
 }
 
 type configKey struct{}
+
+// confirm writes prompt to w and reports whether the answer read from standard
+// input was yes.
+func confirm(w io.Writer, prompt string) (bool, error) {
+	fmt.Fprint(w, prompt)
+	response, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		return false, fmt.Errorf("failed to read confirmation: %w", err)
+	}
+	response = strings.TrimSpace(strings.ToLower(response))
+	return response == "y" || response == "yes", nil
+}
 
 func GetConfig(cmd *cobra.Command) *CmdConfig {
 	return cmd.Context().Value(configKey{}).(*CmdConfig)
