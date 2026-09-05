@@ -1,3 +1,6 @@
+// Package output renders command results as text or JSON.
+//
+// Deprecated: this package has moved to go.hasteful.org/ffrelayctl/output.
 package output
 
 import (

@@ -1,3 +1,6 @@
+// Package cmd implements the ffrelayctl commands.
+//
+// Deprecated: this package has moved to go.hasteful.org/ffrelayctl/cmd.
 package cmd
 
 import (

@@ -1,5 +1,12 @@
 # ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![Go Report Card](https://goreportcard.com/badge/github.com/hastefuI/ffrelayctl)](https://goreportcard.com/report/github.com/hastefuI/ffrelayctl) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE)
 
+> [!IMPORTANT]
+> This module path is deprecated. `ffrelayctl` has moved to
+> [`go.hasteful.org/ffrelayctl`](https://pkg.go.dev/go.hasteful.org/ffrelayctl).
+> Install it with `go install go.hasteful.org/ffrelayctl@latest` and update any
+> imports of `github.com/hastefuI/ffrelayctl/...` to `go.hasteful.org/ffrelayctl/...`.
+> Development continues on the `main` branch of this repository.
+
 A CLI for [Firefox Relay](https://relay.firefox.com) written in Go.
 
 ## Overview

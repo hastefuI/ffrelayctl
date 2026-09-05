@@ -1,3 +1,6 @@
+// Package api is a client for the Firefox Relay API.
+//
+// Deprecated: this package has moved to go.hasteful.org/ffrelayctl/api.
 package api
 
 import (

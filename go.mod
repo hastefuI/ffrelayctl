@@ -1,3 +1,5 @@
+// Deprecated: ffrelayctl has moved to go.hasteful.org/ffrelayctl. Install it
+// with "go install go.hasteful.org/ffrelayctl@latest".
 module github.com/hastefuI/ffrelayctl
 
 go 1.25
@@ -15,3 +17,7 @@ require (
 	github.com/spf13/pflag v1.0.9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+// Every release under this module path is superseded by
+// go.hasteful.org/ffrelayctl.
+retract [v0.4.1, v1.0.0]
