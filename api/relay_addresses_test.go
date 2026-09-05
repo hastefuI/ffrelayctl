@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -28,8 +29,8 @@ func TestClient_ListRelayAddresses(t *testing.T) {
 				"domain": 1,
 				"full_address": "abc123@relay.firefox.com",
 				"enabled": true,
-				"description": "Shopping",
-				"generated_for": "amazon.com",
+				"description": "Go docs",
+				"generated_for": "go.dev",
 				"used_on": "",
 				"block_list_emails": false,
 				"created_at": "2025-01-01T00:00:00Z",
@@ -416,5 +417,140 @@ func TestClient_ListRelayAddresses_InvalidJSON(t *testing.T) {
 
 	if err == nil {
 		t.Error("ListRelayAddresses() expected error for invalid JSON, got nil")
+	}
+}
+
+func TestClient_FilterRelayAddresses(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	tests := []struct {
+		name      string
+		filter    MaskFilter
+		wantQuery string
+	}{
+		{
+			name:      "empty filter sends no query",
+			filter:    MaskFilter{},
+			wantQuery: "",
+		},
+		{
+			name:      "enabled true",
+			filter:    MaskFilter{Enabled: new(true)},
+			wantQuery: "enabled=true",
+		},
+		{
+			name:      "enabled false",
+			filter:    MaskFilter{Enabled: new(false)},
+			wantQuery: "enabled=false",
+		},
+		{
+			name:      "block list emails false",
+			filter:    MaskFilter{BlockListEmails: new(false)},
+			wantQuery: "block_list_emails=false",
+		},
+		{
+			name:      "used on is escaped",
+			filter:    MaskFilter{UsedOn: "github.com/a b"},
+			wantQuery: "used_on=github.com%2Fa+b",
+		},
+		{
+			name: "every field",
+			filter: MaskFilter{
+				Enabled:         new(true),
+				BlockListEmails: new(true),
+				Address:         "abc123",
+				Description:     "Go docs",
+				GeneratedFor:    "go.dev",
+				UsedOn:          "go",
+			},
+			wantQuery: "address=abc123&block_list_emails=true&description=Go+docs&enabled=true&generated_for=go.dev&used_on=go",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			httpmock.Reset()
+
+			var gotQuery string
+			httpmock.RegisterResponder(
+				http.MethodGet,
+				DefaultBaseURL+relayAddressesPath,
+				func(req *http.Request) (*http.Response, error) {
+					gotQuery = req.URL.RawQuery
+					return httpmock.NewStringResponse(http.StatusOK, `[]`), nil
+				},
+			)
+
+			client := NewClient("test")
+			if _, err := client.FilterRelayAddresses(t.Context(), tt.filter); err != nil {
+				t.Fatalf("FilterRelayAddresses() error = %v", err)
+			}
+
+			if gotQuery != tt.wantQuery {
+				t.Errorf("FilterRelayAddresses() query = %q, want %q", gotQuery, tt.wantQuery)
+			}
+		})
+	}
+}
+
+func TestClient_UpdateRelayAddress_RequestBody(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	tests := []struct {
+		name     string
+		req      UpdateRelayAddressRequest
+		wantBody string
+	}{
+		{
+			name:     "generated for is sent",
+			req:      UpdateRelayAddressRequest{GeneratedFor: new("go.dev")},
+			wantBody: `{"generated_for":"go.dev"}`,
+		},
+		{
+			name:     "used on is sent",
+			req:      UpdateRelayAddressRequest{UsedOn: new("go.dev")},
+			wantBody: `{"used_on":"go.dev"}`,
+		},
+		{
+			name:     "both are cleared by an empty value",
+			req:      UpdateRelayAddressRequest{GeneratedFor: new(""), UsedOn: new("")},
+			wantBody: `{"generated_for":"","used_on":""}`,
+		},
+		{
+			name:     "unset fields are left out",
+			req:      UpdateRelayAddressRequest{Enabled: new(false)},
+			wantBody: `{"enabled":false}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			httpmock.Reset()
+
+			var gotBody string
+			httpmock.RegisterResponder(
+				http.MethodPatch,
+				fmt.Sprintf("%s%s12345/", DefaultBaseURL, relayAddressesPath),
+				func(req *http.Request) (*http.Response, error) {
+					body, err := io.ReadAll(req.Body)
+					if err != nil {
+						return nil, err
+					}
+					gotBody = string(body)
+					return httpmock.NewStringResponse(http.StatusOK, `{"id": 12345}`), nil
+				},
+			)
+
+			client := NewClient("test")
+			if _, err := client.UpdateRelayAddress(t.Context(), 12345, tt.req); err != nil {
+				t.Fatalf("UpdateRelayAddress() error = %v", err)
+			}
+
+			if gotBody != tt.wantBody {
+				t.Errorf("UpdateRelayAddress() body = %s, want %s", gotBody, tt.wantBody)
+			}
+		})
 	}
 }

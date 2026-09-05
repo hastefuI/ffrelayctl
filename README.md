@@ -90,7 +90,7 @@ Available Commands:
   help                           # Display help for any command
   contacts list                  # List phone contacts (premium only)
   contacts update                # Update a phone contact (premium only)
-  masks list                     # List all masks
+  masks list                     # List all masks (filterable)
   masks get                      # Get a mask
   masks create                   # Create a new mask
   masks update                   # Update a mask
@@ -121,7 +121,16 @@ $ ffrelayctl profiles list --output json | jq '.[].subdomain'
 $ ffrelayctl masks create --description "GitHub" --generated-for "github.com"
 
 # List all enabled masks
-$ ffrelayctl masks list --output json | jq '.[] | select(.mask.enabled == true)'
+$ ffrelayctl masks list --enabled
+
+# Record what a mask is used on, which normally only the add-on does
+$ ffrelayctl masks update 12345 --used-on "github.com"
+
+# List masks recorded as used on a site (case-insensitive substring match)
+$ ffrelayctl masks list --used-on github.com
+
+# List random masks generated for a site, disabled and blocking promotional email
+$ ffrelayctl masks list --generated-for go.dev --disabled --block-list
 
 # List email addresses in use by all masks
 $ ffrelayctl masks list --output json | jq '.[].mask.full_address'

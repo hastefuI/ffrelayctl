@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strconv"
 )
 
 // Profile is a Firefox Relay account profile. It carries the subscription
@@ -97,6 +99,7 @@ type CreateRelayAddressRequest struct {
 type UpdateRelayAddressRequest struct {
 	Enabled         *bool   `json:"enabled,omitempty"`
 	Description     *string `json:"description,omitempty"`
+	GeneratedFor    *string `json:"generated_for,omitempty"`
 	BlockListEmails *bool   `json:"block_list_emails,omitempty"`
 	UsedOn          *string `json:"used_on,omitempty"`
 }
@@ -109,6 +112,7 @@ type DomainAddress struct {
 	FullAddress     string  `json:"full_address"`
 	Enabled         bool    `json:"enabled"`
 	Description     string  `json:"description"`
+	UsedOn          string  `json:"used_on"`
 	BlockListEmails bool    `json:"block_list_emails"`
 	CreatedAt       string  `json:"created_at"`
 	LastUsedAt      *string `json:"last_used_at"`
@@ -124,6 +128,7 @@ type CreateDomainAddressRequest struct {
 	Enabled         bool   `json:"enabled"`
 	Description     string `json:"description,omitempty"`
 	BlockListEmails bool   `json:"block_list_emails"`
+	UsedOn          string `json:"used_on,omitempty"`
 }
 
 // UpdateDomainAddressRequest is the body for Client.UpdateDomainAddress.
@@ -132,6 +137,64 @@ type UpdateDomainAddressRequest struct {
 	Enabled         *bool   `json:"enabled,omitempty"`
 	Description     *string `json:"description,omitempty"`
 	BlockListEmails *bool   `json:"block_list_emails,omitempty"`
+	UsedOn          *string `json:"used_on,omitempty"`
+}
+
+// MaskFilter narrows a mask listing to the masks that match every field set on
+// it. The zero value matches every mask.
+//
+// Relay matches UsedOn as a case-insensitive substring. Every other field is
+// matched exactly.
+type MaskFilter struct {
+	// Enabled keeps only the masks that forward mail (true) or only those
+	// that block it (false). A nil value keeps both.
+	Enabled *bool
+	// BlockListEmails keeps only the masks that block promotional mail (true)
+	// or only those that do not (false). A nil value keeps both.
+	BlockListEmails *bool
+	// Address is the local part of a mask, so "abc123" for the mask
+	// abc123@mozmail.com. An empty value keeps every address.
+	Address string
+	// Description is the label put on a mask. An empty value keeps every
+	// description.
+	Description string
+	// GeneratedFor is the site a mask was generated for. Only random masks
+	// carry it, so it is left off when filtering masks on the account's own
+	// subdomain. An empty value keeps every mask.
+	GeneratedFor string
+	// UsedOn is the record of the sites a mask is used on, matched as a
+	// case-insensitive substring. An empty value keeps every mask.
+	UsedOn string
+}
+
+// query encodes the filter as a query string, prefixed with "?", and returns
+// an empty string when no field is set. generatedFor reports whether the
+// endpoint being called has a generated_for field to filter on.
+func (f MaskFilter) query(generatedFor bool) string {
+	values := url.Values{}
+	if f.Enabled != nil {
+		values.Set("enabled", strconv.FormatBool(*f.Enabled))
+	}
+	if f.BlockListEmails != nil {
+		values.Set("block_list_emails", strconv.FormatBool(*f.BlockListEmails))
+	}
+	if f.Address != "" {
+		values.Set("address", f.Address)
+	}
+	if f.Description != "" {
+		values.Set("description", f.Description)
+	}
+	if generatedFor && f.GeneratedFor != "" {
+		values.Set("generated_for", f.GeneratedFor)
+	}
+	if f.UsedOn != "" {
+		values.Set("used_on", f.UsedOn)
+	}
+
+	if len(values) == 0 {
+		return ""
+	}
+	return "?" + values.Encode()
 }
 
 // RelayNumber is a phone mask, with its call and text counters and the quota

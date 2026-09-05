@@ -15,7 +15,13 @@ const (
 
 // ListRelayAddresses returns every random email mask on the account.
 func (c *Client) ListRelayAddresses(ctx context.Context) ([]RelayAddress, error) {
-	resp, err := c.Get(ctx, relayAddressesPath)
+	return c.FilterRelayAddresses(ctx, MaskFilter{})
+}
+
+// FilterRelayAddresses returns the random email masks that match filter. A
+// zero MaskFilter returns every random mask, as ListRelayAddresses does.
+func (c *Client) FilterRelayAddresses(ctx context.Context, filter MaskFilter) ([]RelayAddress, error) {
+	resp, err := c.Get(ctx, relayAddressesPath+filter.query(true))
 	if err != nil {
 		return nil, err
 	}

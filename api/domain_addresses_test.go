@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -432,4 +433,124 @@ func TestClient_ListDomainAddresses_InvalidJSON(t *testing.T) {
 	if err == nil {
 		t.Error("ListDomainAddresses() expected error for invalid JSON, got nil")
 	}
+}
+
+func TestClient_FilterDomainAddresses(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	tests := []struct {
+		name      string
+		filter    MaskFilter
+		wantQuery string
+	}{
+		{
+			name:      "empty filter sends no query",
+			filter:    MaskFilter{},
+			wantQuery: "",
+		},
+		{
+			name:      "generated for is dropped",
+			filter:    MaskFilter{GeneratedFor: "go.dev"},
+			wantQuery: "",
+		},
+		{
+			name:      "generated for is dropped from a filter that keeps its other fields",
+			filter:    MaskFilter{Enabled: new(true), GeneratedFor: "go.dev", UsedOn: "go"},
+			wantQuery: "enabled=true&used_on=go",
+		},
+		{
+			name:      "address and description",
+			filter:    MaskFilter{Address: "shopping", Description: "Shopping"},
+			wantQuery: "address=shopping&description=Shopping",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			httpmock.Reset()
+
+			var gotQuery string
+			httpmock.RegisterResponder(
+				http.MethodGet,
+				DefaultBaseURL+domainAddressesPath,
+				func(req *http.Request) (*http.Response, error) {
+					gotQuery = req.URL.RawQuery
+					return httpmock.NewStringResponse(http.StatusOK, `[]`), nil
+				},
+			)
+
+			client := NewClient("test")
+			if _, err := client.FilterDomainAddresses(t.Context(), tt.filter); err != nil {
+				t.Fatalf("FilterDomainAddresses() error = %v", err)
+			}
+
+			if gotQuery != tt.wantQuery {
+				t.Errorf("FilterDomainAddresses() query = %q, want %q", gotQuery, tt.wantQuery)
+			}
+		})
+	}
+}
+
+func TestClient_DomainAddress_UsedOnRequestBody(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	t.Run("create sends used on", func(t *testing.T) {
+		httpmock.Reset()
+
+		var gotBody string
+		httpmock.RegisterResponder(
+			http.MethodPost,
+			DefaultBaseURL+domainAddressesPath,
+			func(req *http.Request) (*http.Response, error) {
+				body, err := io.ReadAll(req.Body)
+				if err != nil {
+					return nil, err
+				}
+				gotBody = string(body)
+				return httpmock.NewStringResponse(http.StatusCreated, `{"id": 12345}`), nil
+			},
+		)
+
+		client := NewClient("test")
+		req := CreateDomainAddressRequest{Address: "godocs", Enabled: true, UsedOn: "go.dev"}
+		if _, err := client.CreateDomainAddress(t.Context(), req); err != nil {
+			t.Fatalf("CreateDomainAddress() error = %v", err)
+		}
+
+		want := `{"address":"godocs","enabled":true,"block_list_emails":false,"used_on":"go.dev"}`
+		if gotBody != want {
+			t.Errorf("CreateDomainAddress() body = %s, want %s", gotBody, want)
+		}
+	})
+
+	t.Run("update sends used on", func(t *testing.T) {
+		httpmock.Reset()
+
+		var gotBody string
+		httpmock.RegisterResponder(
+			http.MethodPatch,
+			fmt.Sprintf("%s%s12345/", DefaultBaseURL, domainAddressesPath),
+			func(req *http.Request) (*http.Response, error) {
+				body, err := io.ReadAll(req.Body)
+				if err != nil {
+					return nil, err
+				}
+				gotBody = string(body)
+				return httpmock.NewStringResponse(http.StatusOK, `{"id": 12345}`), nil
+			},
+		)
+
+		client := NewClient("test")
+		req := UpdateDomainAddressRequest{UsedOn: new("go.dev")}
+		if _, err := client.UpdateDomainAddress(t.Context(), 12345, req); err != nil {
+			t.Fatalf("UpdateDomainAddress() error = %v", err)
+		}
+
+		want := `{"used_on":"go.dev"}`
+		if gotBody != want {
+			t.Errorf("UpdateDomainAddress() body = %s, want %s", gotBody, want)
+		}
+	})
 }

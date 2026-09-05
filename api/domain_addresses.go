@@ -15,7 +15,15 @@ const (
 
 // ListDomainAddresses returns every mask on the account's own subdomain.
 func (c *Client) ListDomainAddresses(ctx context.Context) ([]DomainAddress, error) {
-	resp, err := c.Get(ctx, domainAddressesPath)
+	return c.FilterDomainAddresses(ctx, MaskFilter{})
+}
+
+// FilterDomainAddresses returns the masks on the account's own subdomain that
+// match filter. A zero MaskFilter returns every such mask, as
+// ListDomainAddresses does. MaskFilter.GeneratedFor is ignored, because only
+// random masks carry that field.
+func (c *Client) FilterDomainAddresses(ctx context.Context, filter MaskFilter) ([]DomainAddress, error) {
+	resp, err := c.Get(ctx, domainAddressesPath+filter.query(false))
 	if err != nil {
 		return nil, err
 	}

@@ -20,6 +20,7 @@ type commonUpdateFields struct {
 	enabled         *bool
 	description     *string
 	blockListEmails *bool
+	usedOn          *string
 }
 
 func parseCommonUpdateFlags(cmd *cobra.Command) (commonUpdateFields, error) {
@@ -48,8 +49,58 @@ func parseCommonUpdateFlags(cmd *cobra.Command) (commonUpdateFields, error) {
 	if cmd.Flags().Changed("no-block-list") {
 		fields.blockListEmails = new(false)
 	}
+	if cmd.Flags().Changed("used-on") {
+		usedOn, err := cmd.Flags().GetString("used-on")
+		if err != nil {
+			return fields, fmt.Errorf("failed to get used-on flag: %w", err)
+		}
+		fields.usedOn = &usedOn
+	}
 
 	return fields, nil
+}
+
+func parseMaskFilterFlags(cmd *cobra.Command) (api.MaskFilter, error) {
+	var filter api.MaskFilter
+
+	if cmd.Flags().Changed("enabled") {
+		filter.Enabled = new(true)
+	}
+	if cmd.Flags().Changed("disabled") {
+		filter.Enabled = new(false)
+	}
+	if cmd.Flags().Changed("block-list") {
+		filter.BlockListEmails = new(true)
+	}
+	if cmd.Flags().Changed("no-block-list") {
+		filter.BlockListEmails = new(false)
+	}
+
+	address, err := cmd.Flags().GetString("address")
+	if err != nil {
+		return filter, fmt.Errorf("failed to get address flag: %w", err)
+	}
+	filter.Address = address
+
+	description, err := cmd.Flags().GetString("description")
+	if err != nil {
+		return filter, fmt.Errorf("failed to get description flag: %w", err)
+	}
+	filter.Description = description
+
+	generatedFor, err := cmd.Flags().GetString("generated-for")
+	if err != nil {
+		return filter, fmt.Errorf("failed to get generated-for flag: %w", err)
+	}
+	filter.GeneratedFor = generatedFor
+
+	usedOn, err := cmd.Flags().GetString("used-on")
+	if err != nil {
+		return filter, fmt.Errorf("failed to get used-on flag: %w", err)
+	}
+	filter.UsedOn = usedOn
+
+	return filter, nil
 }
 
 var masksCmd = &cobra.Command{
@@ -68,41 +119,63 @@ var masksListCmd = &cobra.Command{
 	Short: "List all masks",
 	Long: `List all email masks.
 
+Relay applies the filter flags server side. --used-on matches as a
+case-insensitive substring; --address, --description and --generated-for
+match exactly.
+
 Examples:
-  ffrelayctl masks list                # List all masks (both random and custom domain)
-  ffrelayctl masks list --random=true  # List only random masks
-  ffrelayctl masks list --random=false # List only custom domain masks`,
+  ffrelayctl masks list                            # List all masks (both random and custom domain)
+  ffrelayctl masks list --random=true              # List only random masks
+  ffrelayctl masks list --random=false             # List only custom domain masks
+  ffrelayctl masks list --enabled                  # List only masks that forward mail
+  ffrelayctl masks list --disabled --block-list    # Combine filters
+  ffrelayctl masks list --used-on github.com       # List masks recorded as used on a site
+  ffrelayctl masks list --generated-for go.dev     # List random masks generated for a site`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg := GetConfig(cmd)
+
+		filter, err := parseMaskFilterFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if filter.GeneratedFor != "" && randomMask != nil && !*randomMask {
+			return fmt.Errorf("--generated-for applies to random masks only and cannot be used with --random=false")
+		}
+
 		if randomMask == nil {
-			relayAddresses, err := cfg.Client.ListRelayAddresses(cfg.Ctx)
-			if err != nil {
-				return err
-			}
-			domainAddresses, err := cfg.Client.ListDomainAddresses(cfg.Ctx)
+			relayAddresses, err := cfg.Client.FilterRelayAddresses(cfg.Ctx, filter)
 			if err != nil {
 				return err
 			}
 
-			combined := make([]output.CombinedMask, 0)
+			combined := make([]output.CombinedMask, 0, len(relayAddresses))
 			for _, addr := range relayAddresses {
 				combined = append(combined, output.CombinedMask{Type: "random", Mask: addr})
 			}
-			for _, addr := range domainAddresses {
-				combined = append(combined, output.CombinedMask{Type: "custom", Mask: addr})
+
+			// Only random masks carry generated_for, so no custom domain mask
+			// can match a listing filtered on it.
+			if filter.GeneratedFor == "" {
+				domainAddresses, err := cfg.Client.FilterDomainAddresses(cfg.Ctx, filter)
+				if err != nil {
+					return err
+				}
+				for _, addr := range domainAddresses {
+					combined = append(combined, output.CombinedMask{Type: "custom", Mask: addr})
+				}
 			}
 
 			return output.Print(cfg.OutputFormat, combined)
 		}
 
 		if *randomMask {
-			addresses, err := cfg.Client.ListRelayAddresses(cfg.Ctx)
+			addresses, err := cfg.Client.FilterRelayAddresses(cfg.Ctx, filter)
 			if err != nil {
 				return err
 			}
 			return output.Print(cfg.OutputFormat, addresses)
 		} else {
-			addresses, err := cfg.Client.ListDomainAddresses(cfg.Ctx)
+			addresses, err := cfg.Client.FilterDomainAddresses(cfg.Ctx, filter)
 			if err != nil {
 				return err
 			}
@@ -173,7 +246,7 @@ var masksCreateCmd = &cobra.Command{
 	Long: `Create a new email mask.
 
 For random masks (--random=true, default):
-  ffrelayctl masks create --description "Shopping" --generated-for "amazon.com"
+  ffrelayctl masks create --description "Go docs" --generated-for "go.dev"
 
 For custom domain masks (--random=false, Premium required):
   ffrelayctl masks create --random=false --address "shopping" --description "Shopping sites"`,
@@ -191,17 +264,19 @@ For custom domain masks (--random=false, Premium required):
 		if err != nil {
 			return fmt.Errorf("failed to get disabled flag: %w", err)
 		}
+		generatedFor, err := cmd.Flags().GetString("generated-for")
+		if err != nil {
+			return fmt.Errorf("failed to get generated-for flag: %w", err)
+		}
+		usedOn, err := cmd.Flags().GetString("used-on")
+		if err != nil {
+			return fmt.Errorf("failed to get used-on flag: %w", err)
+		}
+		if generatedFor != "" && randomMask != nil && !*randomMask {
+			return fmt.Errorf("--generated-for applies to random masks only and cannot be used with --random=false")
+		}
 
 		if randomMask == nil || *randomMask {
-			generatedFor, err := cmd.Flags().GetString("generated-for")
-			if err != nil {
-				return fmt.Errorf("failed to get generated-for flag: %w", err)
-			}
-			usedOn, err := cmd.Flags().GetString("used-on")
-			if err != nil {
-				return fmt.Errorf("failed to get used-on flag: %w", err)
-			}
-
 			req := api.CreateRelayAddressRequest{
 				Enabled:         !disabled,
 				Description:     description,
@@ -229,6 +304,7 @@ For custom domain masks (--random=false, Premium required):
 				Enabled:         !disabled,
 				Description:     description,
 				BlockListEmails: blockList,
+				UsedOn:          usedOn,
 			}
 
 			domainAddress, err := cfg.Client.CreateDomainAddress(cfg.Ctx, req)
@@ -245,9 +321,15 @@ var masksUpdateCmd = &cobra.Command{
 	Short: "Update a mask",
 	Long: `Update an existing email mask.
 
+Only the browser add-on normally fills in --generated-for and --used-on, so
+setting them here is what makes "masks list --generated-for" and
+"masks list --used-on" able to find a mask. An empty value clears the field.
+
 Examples:
   ffrelayctl masks update 12345 --disabled
   ffrelayctl masks update 12345 --description "New description"
+  ffrelayctl masks update 12345 --used-on "go.dev"
+  ffrelayctl masks update 12345 --generated-for "go.dev"
   ffrelayctl masks update 12345 --random=false --enabled`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -261,19 +343,23 @@ Examples:
 		if err != nil {
 			return err
 		}
+		if cmd.Flags().Changed("generated-for") && randomMask != nil && !*randomMask {
+			return fmt.Errorf("--generated-for applies to random masks only and cannot be used with --random=false")
+		}
 
 		if randomMask == nil || *randomMask {
 			req := api.UpdateRelayAddressRequest{
 				Enabled:         fields.enabled,
 				Description:     fields.description,
 				BlockListEmails: fields.blockListEmails,
+				UsedOn:          fields.usedOn,
 			}
-			if cmd.Flags().Changed("used-on") {
-				usedOn, err := cmd.Flags().GetString("used-on")
+			if cmd.Flags().Changed("generated-for") {
+				generatedFor, err := cmd.Flags().GetString("generated-for")
 				if err != nil {
-					return fmt.Errorf("failed to get used-on flag: %w", err)
+					return fmt.Errorf("failed to get generated-for flag: %w", err)
 				}
-				req.UsedOn = &usedOn
+				req.GeneratedFor = &generatedFor
 			}
 
 			address, err := cfg.Client.UpdateRelayAddress(cfg.Ctx, id, req)
@@ -286,6 +372,7 @@ Examples:
 				Enabled:         fields.enabled,
 				Description:     fields.description,
 				BlockListEmails: fields.blockListEmails,
+				UsedOn:          fields.usedOn,
 			}
 
 			address, err := cfg.Client.UpdateDomainAddress(cfg.Ctx, id, req)
@@ -411,16 +498,27 @@ func init() {
 		}
 	}
 
+	masksListCmd.Flags().Bool("enabled", false, "Only masks that forward mail")
+	masksListCmd.Flags().Bool("disabled", false, "Only masks that block mail")
+	masksListCmd.Flags().Bool("block-list", false, "Only masks that block promotional emails")
+	masksListCmd.Flags().Bool("no-block-list", false, "Only masks that do not block promotional emails")
+	masksListCmd.Flags().String("address", "", "Only the mask with this local part")
+	masksListCmd.Flags().String("description", "", "Only masks with this exact description")
+	masksListCmd.Flags().String("generated-for", "", "Only random masks generated for this site")
+	masksListCmd.Flags().String("used-on", "", "Only masks used on a site containing this text")
+	masksListCmd.MarkFlagsMutuallyExclusive("enabled", "disabled")
+	masksListCmd.MarkFlagsMutuallyExclusive("block-list", "no-block-list")
 	masksCreateCmd.Flags().String("description", "", "Description for the mask")
 	masksCreateCmd.Flags().String("generated-for", "", "Site the mask was generated for (random masks only)")
-	masksCreateCmd.Flags().String("used-on", "", "Site the mask is used on (random masks only)")
+	masksCreateCmd.Flags().String("used-on", "", "Sites the mask is used on")
 	masksCreateCmd.Flags().String("address", "", "Local part of the address (custom domain masks only, required)")
 	masksCreateCmd.Flags().Bool("block-list", false, "Block promotional emails")
 	masksCreateCmd.Flags().Bool("disabled", false, "Create in disabled state")
 	masksUpdateCmd.Flags().Bool("enabled", false, "Enable the mask")
 	masksUpdateCmd.Flags().Bool("disabled", false, "Disable the mask")
 	masksUpdateCmd.Flags().String("description", "", "Update description")
-	masksUpdateCmd.Flags().String("used-on", "", "Update used on (random masks only)")
+	masksUpdateCmd.Flags().String("generated-for", "", "Update the site the mask was generated for (random masks only)")
+	masksUpdateCmd.Flags().String("used-on", "", "Update the sites the mask is used on")
 	masksUpdateCmd.Flags().Bool("block-list", false, "Block promotional emails")
 	masksUpdateCmd.Flags().Bool("no-block-list", false, "Don't block promotional emails")
 	masksUpdateCmd.MarkFlagsMutuallyExclusive("enabled", "disabled")
