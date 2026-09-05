@@ -9,7 +9,7 @@ This document provides guidelines for contributing to the project.
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
-- [Go](https://go.dev/doc/install) (version 1.25 or later)
+- [Go](https://go.dev/doc/install) (version 1.27 or later, as set in `go.mod`)
 - [Git](https://git-scm.com/install/)
 - [Docker](https://docs.docker.com/get-started/get-docker/) (required for commit hooks)
 
@@ -44,7 +44,7 @@ You can run the built binary directly:
 $ ./ffrelayctl --help
 ```
 
-Or install it to your `$GOPATH/bin`:
+Or install it to your Go bin directory:
 
 ```bash
 $ go install .
@@ -52,13 +52,34 @@ $ go install .
 
 ### Testing
 
-Ensure you have a Firefox Relay API key set as an environment variable:
+Run the unit tests and `go vet` the way CI does:
+
+```bash
+$ make check
+```
+
+The individual targets are also available:
+
+```bash
+$ make vet
+$ make test
+```
+
+CI runs the tests with the race detector on Linux and macOS, so it is worth
+doing the same locally before opening a pull request:
+
+```bash
+$ go test -race ./...
+```
+
+To exercise the CLI against the live API, set a Firefox Relay API key as an
+environment variable:
 
 ```bash
 $ export FFRELAYCTL_KEY=replace-me
 ```
 
-Test commands manually:
+Then run commands manually:
 
 ```bash
 $ ./ffrelayctl profiles list
@@ -80,8 +101,9 @@ $ git checkout -b fix/fix-name
 ### Code Style
 
 - Follow standard Go conventions
-- Run `$ go fmt` to format your code
-- Ensure your code passes `$ go vet`
+- Format your code with `$ gofmt -w .`; CI fails if `$ gofmt -l .` reports anything
+- Ensure your code passes `$ go vet ./...`
+- Keep `go.mod` and `go.sum` tidy with `$ go mod tidy`
 - Keep things [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
 
 ## Commit Guidelines
@@ -97,6 +119,12 @@ Common scopes in this project:
 - `phones`: Phone masks
 - `profiles`: Profile management
 - `contacts`: Contact management
+- `users`: Account users
+- `export`: Data export
+- `ci`: GitHub Actions workflows
+- `docker`: Dockerfile and image builds
+- `deps`: Dependency updates
+- `goreleaser`: GoReleaser configuration
 - `dev`: Development tools, setup, experience
 - `release`: Release process
 - `readme`: README documentation
@@ -128,10 +156,16 @@ chore(deps): update dependencies to latest versions
 ### PR Requirements
 
 - All commits must follow conventional commit format
-- Code must be properly formatted (`go fmt`)
-- No new warnings from `go vet`
+- Code must be properly formatted (`gofmt -l .` reports nothing)
+- No new warnings from `go vet ./...`
+- Tests must pass on Linux, macOS, and Windows
+- `go mod tidy` must leave `go.mod` and `go.sum` unchanged
+- The code must cross-compile and pass `govulncheck`
+- The Docker image must still build
 - The PR should focus on a single feature or fix
 - Keep PRs reasonably sized for easier review
+
+CI enforces all of the above on every push and pull request.
 
 ## Reporting Issues
 
