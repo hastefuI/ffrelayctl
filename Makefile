@@ -12,6 +12,9 @@ setup: ## Set up development environment
 	@git config core.hooksPath .githooks
 	@chmod +x .githooks/commit-msg
 	@echo "Git hooks installed"
+	@echo "Building commitlint image..."
+	@docker build -q -t ffrelayctl-commitlint build/package/commitlint >/dev/null
+	@echo "Commitlint image ready"
 
 .PHONY: vet
 vet: ## Run go vet
