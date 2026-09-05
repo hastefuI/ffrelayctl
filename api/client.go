@@ -22,8 +22,8 @@ const (
 	APIBasePath = "/api/v1/"
 	// DefaultTimeout is the HTTP timeout used unless WithTimeout says otherwise.
 	DefaultTimeout = 30 * time.Second
-	// ContentTypeJson is the media type sent and accepted on every request.
-	ContentTypeJson = "application/json"
+	// ContentTypeJSON is the media type sent and accepted on every request.
+	ContentTypeJSON = "application/json"
 )
 
 // Client holds the token and the HTTP settings used for API calls.
@@ -99,8 +99,8 @@ func (c *Client) NewRequest(ctx context.Context, method, path string, body io.Re
 	}
 
 	req.Header.Set("Authorization", "Token "+c.Token)
-	req.Header.Set("Content-Type", ContentTypeJson)
-	req.Header.Set("Accept", ContentTypeJson)
+	req.Header.Set("Content-Type", ContentTypeJSON)
+	req.Header.Set("Accept", ContentTypeJSON)
 	if c.UserAgent != "" {
 		req.Header.Set("User-Agent", c.UserAgent)
 	}
