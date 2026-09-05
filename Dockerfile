@@ -2,16 +2,16 @@ FROM golang:1.27-alpine AS builder
 
 WORKDIR /build
 
+ARG VERSION=dev
+
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build \
-    -a \
-    -installsuffix cgo \
-    -ldflags='-w -s -extldflags "-static"' \
     -trimpath \
+    -ldflags="-s -w -X main.version=${VERSION}" \
     -o ffrelayctl .
 
 FROM gcr.io/distroless/static:nonroot
