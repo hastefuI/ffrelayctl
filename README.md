@@ -145,6 +145,42 @@ $ ffrelayctl contacts list --output json | jq '[.[] | select(.last_inbound_type 
 $ docker run --rm -e FFRELAYCTL_KEY=<replace-me> ffrelayctl profiles list
 ```
 
+## Library
+
+The Firefox Relay API client is importable without the CLI:
+
+```bash
+$ go get go.hasteful.org/ffrelayctl/api
+```
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"go.hasteful.org/ffrelayctl/api"
+)
+
+func main() {
+	client := api.NewClient(os.Getenv("FFRELAYCTL_KEY"))
+
+	masks, err := client.ListRelayAddresses(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	for _, mask := range masks {
+		fmt.Println(mask.FullAddress)
+	}
+}
+```
+
+See the [reference](https://pkg.go.dev/go.hasteful.org/ffrelayctl/api) for the
+full API.
+
 ## Development
 
 ### Setup
