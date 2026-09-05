@@ -10,7 +10,27 @@ permissions:
   packages: write
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.check.outputs.release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Check the module path
+        id: check
+        run: |
+          if grep -qx 'module go.hasteful.org/ffrelayctl' go.mod; then
+            echo 'release=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'release=false' >> "$GITHUB_OUTPUT"
+            echo "::notice::${GITHUB_REF_NAME} is on the retired module path github.com/hastefuI/ffrelayctl; skipping the release"
+          fi
+
   goreleaser:
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
