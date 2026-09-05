@@ -10,7 +10,11 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
 
@@ -27,13 +31,71 @@ jobs:
         run: go mod download
 
       - name: Build
-        run: go build -o ffrelayctl .
+        run: go build ./...
 
       - name: Run go vet
         run: go vet ./...
 
+      # The race detector needs a C toolchain, which the Windows runner is not
+      # guaranteed to have.
       - name: Run tests
+        if: matrix.os != 'windows-latest'
+        run: go test -v -race ./...
+
+      - name: Run tests without the race detector
+        if: matrix.os == 'windows-latest'
         run: go test -v ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Check formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "not gofmt'd:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: Check go mod tidy is clean
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+
+      - name: Cross-compile
+        run: |
+          for target in linux/arm64 darwin/arm64 windows/arm64 freebsd/amd64; do
+            GOOS=${target%/*} GOARCH=${target#*/} go build ./...
+          done
+
+  vuln:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Run govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./...
 
   docker-build:
     runs-on: ubuntu-latest
