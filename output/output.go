@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/hastefuI/ffrelayctl/api"
+	"go.hasteful.org/ffrelayctl/api"
 )
 
 const (

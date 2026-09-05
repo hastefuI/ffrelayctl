@@ -1,4 +1,4 @@
-# ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)](https://go.dev) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE)
+# ffrelayctl [![Build](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hastefuI/ffrelayctl/actions/workflows/ci.yml) [![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)](https://go.dev) [![Release](https://img.shields.io/github/v/release/hastefuI/ffrelayctl)](https://github.com/hastefuI/ffrelayctl/releases) [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hastefuI/ffrelayctl/blob/main/LICENSE) [![Go Reference](https://pkg.go.dev/badge/go.hasteful.org/ffrelayctl.svg)](https://pkg.go.dev/go.hasteful.org/ffrelayctl)
 
 A CLI for [Firefox Relay](https://relay.firefox.com) written in Go.
 
@@ -29,9 +29,17 @@ $ brew install --cask ffrelayctl
 
 Download, extract, and install the latest release for your platform from the [releases page](https://github.com/hastefuI/ffrelayctl/releases).
 
+### Go Install
+
+`ffrelayctl` requires Go 1.27 or newer.
+
+```bash
+$ go install go.hasteful.org/ffrelayctl@latest
+```
+
 ### Build From Source
 
-`ffrelayctl` requires Go 1.27 or newer. Clone this repository, and then:
+Clone this repository, and then:
 ```bash
 # Build
 $ go build -o ffrelayctl .

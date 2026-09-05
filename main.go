@@ -1,6 +1,6 @@
 package main
 
-import "github.com/hastefuI/ffrelayctl/cmd"
+import "go.hasteful.org/ffrelayctl/cmd"
 
 var (
 	version = "dev"

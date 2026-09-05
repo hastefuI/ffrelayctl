@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
+	"go.hasteful.org/ffrelayctl/output"
 )
 
 var profilesCmd = &cobra.Command{

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/hastefuI/ffrelayctl/api"
-	"github.com/hastefuI/ffrelayctl/output"
 	"github.com/spf13/cobra"
+	"go.hasteful.org/ffrelayctl/api"
+	"go.hasteful.org/ffrelayctl/output"
 )
 
 var contactsCmd = &cobra.Command{

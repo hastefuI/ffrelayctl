@@ -1,4 +1,4 @@
-module github.com/hastefuI/ffrelayctl
+module go.hasteful.org/ffrelayctl
 
 go 1.27
 
