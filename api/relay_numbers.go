@@ -13,6 +13,7 @@ const (
 	relayNumbersPath = APIBasePath + "relaynumber/"
 )
 
+// ListRelayNumbers returns the phone masks on the account.
 func (c *Client) ListRelayNumbers(ctx context.Context) ([]RelayNumber, error) {
 	resp, err := c.Get(ctx, relayNumbersPath)
 	if err != nil {
@@ -37,6 +38,10 @@ func (c *Client) ListRelayNumbers(ctx context.Context) ([]RelayNumber, error) {
 	return numbers, nil
 }
 
+// GetRelayNumberSuggestions returns the numbers Relay offers for a new phone
+// mask, grouped by how closely each one matches the real number. Relay answers
+// with 400 when it has nothing to offer, which is reported as empty lists
+// rather than as an error.
 func (c *Client) GetRelayNumberSuggestions(ctx context.Context) (*RelayNumberSuggestions, error) {
 	path := relayNumbersPath + "suggestions/"
 	resp, err := c.Get(ctx, path)
@@ -71,6 +76,9 @@ func (c *Client) GetRelayNumberSuggestions(ctx context.Context) (*RelayNumberSug
 	return &suggestions, nil
 }
 
+// SearchRelayNumbers returns the numbers free to be claimed in areaCode. Relay
+// answers with 400 when nothing matches, which is reported as an empty slice
+// rather than as an error.
 func (c *Client) SearchRelayNumbers(ctx context.Context, areaCode string) ([]PhoneNumberOption, error) {
 	path := fmt.Sprintf("%ssearch/?area_code=%s", relayNumbersPath, areaCode)
 	resp, err := c.Get(ctx, path)
@@ -100,6 +108,8 @@ func (c *Client) SearchRelayNumbers(ctx context.Context, areaCode string) ([]Pho
 	return numbers, nil
 }
 
+// UpdateRelayNumber applies the fields set in req to the phone mask with the
+// given id and returns the updated mask.
 func (c *Client) UpdateRelayNumber(ctx context.Context, id int, req UpdateRelayNumberRequest) (*RelayNumber, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {

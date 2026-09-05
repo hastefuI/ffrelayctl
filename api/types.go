@@ -5,7 +5,8 @@ import (
 	"fmt"
 )
 
-// Firefox Relay Profile
+// Profile is a Firefox Relay account profile. It carries the subscription
+// state and the counters totalled across every mask on the account.
 type Profile struct {
 	ID                          int          `json:"id"`
 	ServerStorage               bool         `json:"server_storage"`
@@ -24,11 +25,15 @@ type Profile struct {
 	BounceStatus                BounceStatus `json:"bounce_status"`
 }
 
+// BounceStatus reports whether email forwarding is paused because a message
+// bounced, and which kind of bounce paused it. Relay sends the pair as a two
+// element array rather than an object.
 type BounceStatus struct {
 	Paused bool
 	Type   string
 }
 
+// UnmarshalJSON decodes the paused and type pair Relay sends as an array.
 func (b *BounceStatus) UnmarshalJSON(data []byte) error {
 	var tuple []any
 	if err := json.Unmarshal(data, &tuple); err != nil {
@@ -54,10 +59,12 @@ func (b *BounceStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON encodes the paused and type pair back into the array Relay expects.
 func (b BounceStatus) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]any{b.Paused, b.Type})
 }
 
+// RelayAddress is a random email mask and its forwarding counters.
 type RelayAddress struct {
 	ID              int     `json:"id"`
 	Address         string  `json:"address"`
@@ -76,6 +83,7 @@ type RelayAddress struct {
 	NumSpam         int     `json:"num_spam"`
 }
 
+// CreateRelayAddressRequest is the body for Client.CreateRelayAddress.
 type CreateRelayAddressRequest struct {
 	Enabled         bool   `json:"enabled"`
 	Description     string `json:"description,omitempty"`
@@ -84,6 +92,8 @@ type CreateRelayAddressRequest struct {
 	UsedOn          string `json:"used_on,omitempty"`
 }
 
+// UpdateRelayAddressRequest is the body for Client.UpdateRelayAddress.
+// A nil field leaves that value unchanged.
 type UpdateRelayAddressRequest struct {
 	Enabled         *bool   `json:"enabled,omitempty"`
 	Description     *string `json:"description,omitempty"`
@@ -91,6 +101,8 @@ type UpdateRelayAddressRequest struct {
 	UsedOn          *string `json:"used_on,omitempty"`
 }
 
+// DomainAddress is an email mask on the account's own subdomain, which is a
+// premium feature, and its forwarding counters.
 type DomainAddress struct {
 	ID              int     `json:"id"`
 	Address         string  `json:"address"`
@@ -106,6 +118,7 @@ type DomainAddress struct {
 	NumSpam         int     `json:"num_spam"`
 }
 
+// CreateDomainAddressRequest is the body for Client.CreateDomainAddress.
 type CreateDomainAddressRequest struct {
 	Address         string `json:"address"`
 	Enabled         bool   `json:"enabled"`
@@ -113,12 +126,16 @@ type CreateDomainAddressRequest struct {
 	BlockListEmails bool   `json:"block_list_emails"`
 }
 
+// UpdateDomainAddressRequest is the body for Client.UpdateDomainAddress.
+// A nil field leaves that value unchanged.
 type UpdateDomainAddressRequest struct {
 	Enabled         *bool   `json:"enabled,omitempty"`
 	Description     *string `json:"description,omitempty"`
 	BlockListEmails *bool   `json:"block_list_emails,omitempty"`
 }
 
+// RelayNumber is a phone mask, with its call and text counters and the quota
+// left for the current month.
 type RelayNumber struct {
 	ID             int     `json:"id"`
 	Number         string  `json:"number"`
@@ -135,10 +152,13 @@ type RelayNumber struct {
 	TextsBlocked   int     `json:"texts_blocked"`
 }
 
+// UpdateRelayNumberRequest is the body for Client.UpdateRelayNumber.
+// A nil field leaves that value unchanged.
 type UpdateRelayNumberRequest struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
 
+// PhoneNumberOption is a phone number that is free to be claimed as a mask.
 type PhoneNumberOption struct {
 	FriendlyName string  `json:"friendly_name"`
 	ISOCountry   string  `json:"iso_country"`
@@ -148,6 +168,8 @@ type PhoneNumberOption struct {
 	Region       string  `json:"region"`
 }
 
+// RelayNumberSuggestions groups the numbers Relay offers for a new phone mask
+// by how closely each one matches the real number.
 type RelayNumberSuggestions struct {
 	RealNum           *string             `json:"real_num"`
 	SamePrefixOptions []PhoneNumberOption `json:"same_prefix_options"`
@@ -156,6 +178,8 @@ type RelayNumberSuggestions struct {
 	RandomOptions     []PhoneNumberOption `json:"random_options"`
 }
 
+// InboundContact is a number that has called or texted a phone mask, with the
+// counters kept for that one contact and whether it is blocked.
 type InboundContact struct {
 	ID              int     `json:"id"`
 	RelayNumber     int     `json:"relay_number"`
@@ -171,14 +195,19 @@ type InboundContact struct {
 	Blocked         bool    `json:"blocked"`
 }
 
+// UpdateInboundContactRequest is the body for Client.UpdateInboundContact.
+// A nil field leaves that value unchanged.
 type UpdateInboundContactRequest struct {
 	Blocked *bool `json:"blocked,omitempty"`
 }
 
+// User is the account the API token belongs to.
 type User struct {
 	Email string `json:"email"`
 }
 
+// RealPhone is a phone number registered on the account, which is the number a
+// phone mask forwards to once it is verified.
 type RealPhone struct {
 	ID                   int     `json:"id"`
 	Number               string  `json:"number"`
@@ -188,20 +217,25 @@ type RealPhone struct {
 	CountryCode          string  `json:"country_code"`
 }
 
+// RegisterRealPhoneRequest is the body for Client.RegisterRealPhone.
 type RegisterRealPhoneRequest struct {
 	Number string `json:"number"`
 }
 
+// VerifyRealPhoneRequest is the body for Client.VerifyRealPhone. It carries
+// the code Relay sent by text.
 type VerifyRealPhoneRequest struct {
 	Number           string `json:"number"`
 	VerificationCode string `json:"verification_code"`
 }
 
+// APIError is returned when Relay answers with a status of 400 or above.
 type APIError struct {
 	StatusCode int
 	Body       string
 }
 
+// Error returns the raw response body.
 func (e *APIError) Error() string {
 	return e.Body
 }

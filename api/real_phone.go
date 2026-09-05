@@ -11,6 +11,8 @@ import (
 
 const realPhonePath = APIBasePath + "realphone/"
 
+// GetRealPhone returns the phone numbers registered on the account, whether or
+// not they are verified.
 func (c *Client) GetRealPhone(ctx context.Context) ([]RealPhone, error) {
 	resp, err := c.Get(ctx, realPhonePath)
 	if err != nil {
@@ -35,6 +37,9 @@ func (c *Client) GetRealPhone(ctx context.Context) ([]RealPhone, error) {
 	return phones, nil
 }
 
+// RegisterRealPhone registers a real phone number and asks Relay to text it a
+// verification code. The number returned is unverified until VerifyRealPhone
+// is called with that code.
 func (c *Client) RegisterRealPhone(ctx context.Context, req RegisterRealPhoneRequest) (*RealPhone, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
@@ -64,6 +69,8 @@ func (c *Client) RegisterRealPhone(ctx context.Context, req RegisterRealPhoneReq
 	return &phone, nil
 }
 
+// VerifyRealPhone confirms the registration with the given id using the code
+// Relay sent by text.
 func (c *Client) VerifyRealPhone(ctx context.Context, id int, req VerifyRealPhoneRequest) (*RealPhone, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
@@ -94,6 +101,7 @@ func (c *Client) VerifyRealPhone(ctx context.Context, id int, req VerifyRealPhon
 	return &phone, nil
 }
 
+// DeleteRealPhone removes the registered phone number with the given id.
 func (c *Client) DeleteRealPhone(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s%d/", realPhonePath, id)
 	resp, err := c.Delete(ctx, path)

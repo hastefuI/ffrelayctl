@@ -13,6 +13,7 @@ const (
 	relayAddressesPath = APIBasePath + "relayaddresses/"
 )
 
+// ListRelayAddresses returns every random email mask on the account.
 func (c *Client) ListRelayAddresses(ctx context.Context) ([]RelayAddress, error) {
 	resp, err := c.Get(ctx, relayAddressesPath)
 	if err != nil {
@@ -37,6 +38,7 @@ func (c *Client) ListRelayAddresses(ctx context.Context) ([]RelayAddress, error)
 	return addresses, nil
 }
 
+// GetRelayAddress returns the random email mask with the given id.
 func (c *Client) GetRelayAddress(ctx context.Context, id int) (*RelayAddress, error) {
 	path := fmt.Sprintf("%s%d/", relayAddressesPath, id)
 	resp, err := c.Get(ctx, path)
@@ -62,6 +64,8 @@ func (c *Client) GetRelayAddress(ctx context.Context, id int) (*RelayAddress, er
 	return &address, nil
 }
 
+// CreateRelayAddress creates a random email mask and returns it. Relay picks
+// the address, so req only carries the settings for the new mask.
 func (c *Client) CreateRelayAddress(ctx context.Context, req CreateRelayAddressRequest) (*RelayAddress, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
@@ -91,6 +95,8 @@ func (c *Client) CreateRelayAddress(ctx context.Context, req CreateRelayAddressR
 	return &address, nil
 }
 
+// UpdateRelayAddress applies the fields set in req to the random email mask
+// with the given id and returns the updated mask.
 func (c *Client) UpdateRelayAddress(ctx context.Context, id int, req UpdateRelayAddressRequest) (*RelayAddress, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
@@ -121,6 +127,8 @@ func (c *Client) UpdateRelayAddress(ctx context.Context, id int, req UpdateRelay
 	return &address, nil
 }
 
+// DeleteRelayAddress deletes the random email mask with the given id. Mail
+// sent to a deleted mask is no longer forwarded.
 func (c *Client) DeleteRelayAddress(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s%d/", relayAddressesPath, id)
 	resp, err := c.Delete(ctx, path)

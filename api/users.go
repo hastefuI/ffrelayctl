@@ -9,6 +9,7 @@ import (
 
 const usersPath = APIBasePath + "users/"
 
+// ListUsers returns the users the token can see, which is the account owner.
 func (c *Client) ListUsers(ctx context.Context) ([]User, error) {
 	resp, err := c.Get(ctx, usersPath)
 	if err != nil {

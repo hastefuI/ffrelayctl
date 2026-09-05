@@ -1,3 +1,4 @@
+// Package output renders Firefox Relay values as text tables or as JSON.
 package output
 
 import (
@@ -13,27 +14,37 @@ import (
 )
 
 const (
+	// FormatText prints aligned columns meant to be read in a terminal.
 	FormatText = "text"
+	// FormatJSON prints indented JSON meant to be piped into another tool.
 	FormatJSON = "json"
 )
 
+// CombinedMask pairs a mask with a label for its kind, so random and
+// subdomain masks can be listed together.
 type CombinedMask struct {
 	Type string `json:"type"`
 	Mask any    `json:"mask"`
 }
 
+// ValidFormats returns the formats Fprint accepts.
 func ValidFormats() []string {
 	return []string{FormatText, FormatJSON}
 }
 
+// IsValidFormat reports whether format is one of ValidFormats.
 func IsValidFormat(format string) bool {
 	return slices.Contains(ValidFormats(), format)
 }
 
+// Print writes v to standard output in the given format.
 func Print(format string, v any) error {
 	return Fprint(os.Stdout, format, v)
 }
 
+// Fprint writes v to w in the given format, and returns an error if the format
+// is not one of ValidFormats. FormatText has a table for each Firefox Relay
+// type and falls back to JSON for anything else.
 func Fprint(w io.Writer, format string, v any) error {
 	switch format {
 	case FormatJSON:

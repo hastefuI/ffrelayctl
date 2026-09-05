@@ -11,6 +11,7 @@ const (
 	profilesPath = APIBasePath + "profiles/"
 )
 
+// GetProfiles returns the profiles for the account. Relay returns one.
 func (c *Client) GetProfiles(ctx context.Context) ([]Profile, error) {
 	resp, err := c.Get(ctx, profilesPath)
 	if err != nil {

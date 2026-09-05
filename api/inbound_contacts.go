@@ -13,6 +13,8 @@ const (
 	inboundContactsPath = APIBasePath + "inboundcontact/"
 )
 
+// ListInboundContacts returns the numbers that have called or texted a phone
+// mask on the account.
 func (c *Client) ListInboundContacts(ctx context.Context) ([]InboundContact, error) {
 	resp, err := c.Get(ctx, inboundContactsPath)
 	if err != nil {
@@ -37,6 +39,8 @@ func (c *Client) ListInboundContacts(ctx context.Context) ([]InboundContact, err
 	return contacts, nil
 }
 
+// UpdateInboundContact applies the fields set in req to the contact with the
+// given id, which is how a contact is blocked or unblocked.
 func (c *Client) UpdateInboundContact(ctx context.Context, id int, req UpdateInboundContactRequest) (*InboundContact, error) {
 	jsonBody, err := json.Marshal(req)
 	if err != nil {
