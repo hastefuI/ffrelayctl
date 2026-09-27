@@ -1,3 +1,3 @@
-FROM commitlint/commitlint:21.2.2
+FROM commitlint/commitlint:21.2.3
 
 WORKDIR /repo
